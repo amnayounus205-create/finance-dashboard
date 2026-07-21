@@ -1,30 +1,54 @@
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import Card from "../components/common/Card";
+import { useFinance } from "../context/FinanceContext";
 
 function Dashboard() {
-  const { user, logout } = useAuth();
-
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-  };
+  const {
+    totalBalance,
+    totalIncome,
+    totalExpense,
+    remainingBudget,
+    monthlySavings,
+  } = useFinance();
 
   return (
-    <div className="p-10">
-      <h1 className="text-3xl font-bold">
-        Welcome, {user?.name}
+    <div>
+      <h1 className="text-3xl font-bold mb-8">
+        Dashboard
       </h1>
 
-      <p className="mt-2">{user?.email}</p>
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-5">
 
-      <button
-        onClick={handleLogout}
-        className="mt-6 bg-red-500 text-white px-5 py-2 rounded-lg"
-      >
-        Logout
-      </button>
+        <Card
+          title="Total Balance"
+          value={totalBalance}
+          color="#2563EB"
+        />
+
+        <Card
+          title="Total Income"
+          value={totalIncome}
+          color="#22C55E"
+        />
+
+        <Card
+          title="Total Expenses"
+          value={totalExpense}
+          color="#EF4444"
+        />
+
+        <Card
+          title="Remaining Budget"
+          value={remainingBudget}
+          color="#F59E0B"
+        />
+
+        <Card
+          title="Monthly Savings"
+          value={monthlySavings}
+          color="#3B82F6"
+        />
+
+      </div>
     </div>
   );
 }
