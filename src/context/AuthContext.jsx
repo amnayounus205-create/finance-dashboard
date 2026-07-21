@@ -6,17 +6,18 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem("financeUser");
+    const storedUser = localStorage.getItem("financeUser");
 
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
     }
   }, []);
 
   const login = (email) => {
     const userData = {
-      email,
+      id: Date.now(),
       name: "Finance User",
+      email,
     };
 
     setUser(userData);
