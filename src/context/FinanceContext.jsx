@@ -1,67 +1,172 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useReducer } from "react";
+import { financeReducer, initialState } from "../reducers/financeReducer";
+import useLocalStorage from "../hooks/useLocalStorage";
+import {
+  calculateBalance,
+  calculateRemainingBudget,
+  calculateTotal,
+} from "../utils/calculations";
 
 const FinanceContext = createContext();
 
 export const FinanceProvider = ({ children }) => {
-  const [incomes, setIncomes] = useState([]);
-  const [expenses, setExpenses] = useState([]);
-  const [budgets, setBudgets] = useState([]);
+  // Local Storage
+  const [storedData, setStoredData] = useLocalStorage(
+    "finance-data",
+    initialState
+  );
 
-  // Load saved data
+  // Reducer
+  const [state, dispatch] = useReducer(financeReducer, storedData);
+
+  // Save to Local Storage whenever state changes
   useEffect(() => {
-    const savedIncomes = JSON.parse(localStorage.getItem("incomes")) || [];
-    const savedExpenses = JSON.parse(localStorage.getItem("expenses")) || [];
-    const savedBudgets = JSON.parse(localStorage.getItem("budgets")) || [];
+    setStoredData(state);
+  }, [state]);
 
-    setIncomes(savedIncomes);
-    setExpenses(savedExpenses);
-    setBudgets(savedBudgets);
-  }, []);
+  // ===========================
+  // Income CRUD
+  // ===========================
 
-  // Save whenever data changes
-  useEffect(() => {
-    localStorage.setItem("incomes", JSON.stringify(incomes));
-  }, [incomes]);
+  const addIncome = (income) => {
+    dispatch({
+      type: "ADD_INCOME",
+      payload: income,
+    });
+  };
 
-  useEffect(() => {
-    localStorage.setItem("expenses", JSON.stringify(expenses));
-  }, [expenses]);
+  const updateIncome = (income) => {
+    dispatch({
+      type: "UPDATE_INCOME",
+      payload: income,
+    });
+  };
 
-  useEffect(() => {
-    localStorage.setItem("budgets", JSON.stringify(budgets));
-  }, [budgets]);
+  const deleteIncome = (id) => {
+    dispatch({
+      type: "DELETE_INCOME",
+      payload: id,
+    });
+  };
 
-  // Dashboard calculations
+  // ===========================
+  // Expense CRUD
+  // ===========================
+
+  const addExpense = (expense) => {
+    dispatch({
+      type: "ADD_EXPENSE",
+      payload: expense,
+    });
+  };
+
+  const updateExpense = (expense) => {
+    dispatch({
+      type: "UPDATE_EXPENSE",
+      payload: expense,
+    });
+  };
+
+  const deleteExpense = (id) => {
+    dispatch({
+      type: "DELETE_EXPENSE",
+      payload: id,
+    });
+  };
+
+  // ===========================
+  // Budget CRUD
+  // ===========================
+
+  const addBudget = (budget) => {
+    dispatch({
+      type: "ADD_BUDGET",
+      payload: budget,
+    });
+  };
+
+  const updateBudget = (budget) => {
+    dispatch({
+      type: "UPDATE_BUDGET",
+      payload: budget,
+    });
+  };
+
+  const deleteBudget = (id) => {
+    dispatch({
+      type: "DELETE_BUDGET",
+      payload: id,
+    });
+  };
+
+  // ===========================
+  // Dashboard Calculations
+  // ===========================
+
   const totalIncome = useMemo(
-    () => incomes.reduce((sum, item) => sum + Number(item.amount), 0),
-    [incomes]
+    () => calculateTotal(state.incomes),
+    [state.incomes]
   );
 
   const totalExpense = useMemo(
-    () => expenses.reduce((sum, item) => sum + Number(item.amount), 0),
-    [expenses]
+    () => calculateTotal(state.expenses),
+    [state.expenses]
   );
 
   const totalBudget = useMemo(
-    () => budgets.reduce((sum, item) => sum + Number(item.amount), 0),
-    [budgets]
+    () => calculateTotal(state.budgets),
+    [state.budgets]
   );
 
-  const totalBalance = totalIncome - totalExpense;
-  const remainingBudget = totalBudget - totalExpense;
-  const monthlySavings = totalIncome - totalExpense;
+  const totalBalance = calculateBalance(totalIncome, totalExpense);
+
+  const remainingBudget = calculateRemainingBudget(
+    totalBudget,
+    totalExpense
+  );
+
+  const monthlySavings = totalBalance;
+
+  // ===========================
+  // Transactions
+  // ===========================
+
+  const transactions = useMemo(() => {
+    const incomeTransactions = state.incomes.map((item) => ({
+      ...item,
+      type: "Income",
+    }));
+
+    const expenseTransactions = state.expenses.map((item) => ({
+      ...item,
+      type: "Expense",
+    }));
+
+    return [...incomeTransactions, ...expenseTransactions].sort(
+      (a, b) => new Date(b.date) - new Date(a.date)
+    );
+  }, [state.incomes, state.expenses]);
 
   return (
     <FinanceContext.Provider
       value={{
-        incomes,
-        setIncomes,
+        incomes: state.incomes,
+        expenses: state.expenses,
+        budgets: state.budgets,
 
-        expenses,
-        setExpenses,
+        transactions,
 
-        budgets,
-        setBudgets,
+        addIncome,
+        updateIncome,
+        deleteIncome,
+
+        addExpense,
+        updateExpense,
+        deleteExpense,
+
+        addBudget,
+        updateBudget,
+        deleteBudget,
 
         totalIncome,
         totalExpense,

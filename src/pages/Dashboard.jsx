@@ -1,56 +1,33 @@
-import Card from "../components/common/Card";
-import { useFinance } from "../context/FinanceContext";
+import DashboardCards from "../components/dashboard/DashboardCards";
+import IncomeExpenseBarChart from "../components/charts/BarChart";
+import ExpensePieChart from "../components/charts/PieChart";
 
-function Dashboard() {
-  const {
-    totalBalance,
-    totalIncome,
-    totalExpense,
-    remainingBudget,
-    monthlySavings,
-  } = useFinance();
-
+const Dashboard = () => {
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-8">
-        Dashboard
-      </h1>
+    <div className="space-y-8">
 
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-5">
+      <div>
+        <h1 className="text-4xl font-bold text-secondary">
+          Dashboard
+        </h1>
 
-        <Card
-          title="Total Balance"
-          value={totalBalance}
-          color="#2563EB"
-        />
+        <p className="text-gray-500 mt-2">
+          Welcome back! Here's an overview of your finances.
+        </p>
+      </div>
 
-        <Card
-          title="Total Income"
-          value={totalIncome}
-          color="#22C55E"
-        />
+      <DashboardCards />
 
-        <Card
-          title="Total Expenses"
-          value={totalExpense}
-          color="#EF4444"
-        />
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
 
-        <Card
-          title="Remaining Budget"
-          value={remainingBudget}
-          color="#F59E0B"
-        />
+        <IncomeExpenseBarChart />
 
-        <Card
-          title="Monthly Savings"
-          value={monthlySavings}
-          color="#3B82F6"
-        />
+        <ExpensePieChart />
 
       </div>
+
     </div>
   );
-}
+};
 
 export default Dashboard;
