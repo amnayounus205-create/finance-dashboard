@@ -14,7 +14,7 @@ const categories = [
 ];
 
 const IncomeForm = ({ income, onClose }) => {
-  const { addIncome, updateIncome } = useFinance();
+  const { addIncome, updateIncome, accounts = [] } = useFinance();
 
   const {
     register,
@@ -26,6 +26,7 @@ const IncomeForm = ({ income, onClose }) => {
       source: "",
       amount: "",
       category: "",
+      accountId: accounts[0]?.id || "",
       date: "",
       notes: "",
     },
@@ -43,6 +44,7 @@ const IncomeForm = ({ income, onClose }) => {
       source: data.source,
       amount: Number(data.amount),
       category: data.category,
+      accountId: data.accountId,
       date: data.date,
       notes: data.notes,
     };
@@ -60,16 +62,10 @@ const IncomeForm = ({ income, onClose }) => {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="space-y-5"
-    >
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       {/* Income Source */}
       <div>
-        <label className="block mb-2 font-medium">
-          Income Source
-        </label>
-
+        <label className="block mb-2 font-medium">Income Source</label>
         <input
           type="text"
           placeholder="Salary"
@@ -78,18 +74,12 @@ const IncomeForm = ({ income, onClose }) => {
             required: "Income source is required",
           })}
         />
-
-        <p className="text-red-500 text-sm mt-1">
-          {errors.source?.message}
-        </p>
+        <p className="text-red-500 text-sm mt-1">{errors.source?.message}</p>
       </div>
 
       {/* Amount */}
       <div>
-        <label className="block mb-2 font-medium">
-          Amount
-        </label>
-
+        <label className="block mb-2 font-medium">Amount</label>
         <input
           type="number"
           placeholder="5000"
@@ -102,47 +92,51 @@ const IncomeForm = ({ income, onClose }) => {
             },
           })}
         />
-
-        <p className="text-red-500 text-sm mt-1">
-          {errors.amount?.message}
-        </p>
+        <p className="text-red-500 text-sm mt-1">{errors.amount?.message}</p>
       </div>
 
-      {/* Category */}
-      <div>
-        <label className="block mb-2 font-medium">
-          Category
-        </label>
+      {/* Category & Account Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label className="block mb-2 font-medium">Category</label>
+          <select
+            className="w-full border rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            {...register("category", {
+              required: "Category is required",
+            })}
+          >
+            <option value="">Select Category</option>
+            {categories.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
+          </select>
+          <p className="text-red-500 text-sm mt-1">{errors.category?.message}</p>
+        </div>
 
-        <select
-          className="w-full border rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500"
-          {...register("category", {
-            required: "Category is required",
-          })}
-        >
-          <option value="">Select Category</option>
-
-          {categories.map((item) => (
-            <option
-              key={item}
-              value={item}
-            >
-              {item}
-            </option>
-          ))}
-        </select>
-
-        <p className="text-red-500 text-sm mt-1">
-          {errors.category?.message}
-        </p>
+        <div>
+          <label className="block mb-2 font-medium">Account</label>
+          <select
+            className="w-full border rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            {...register("accountId", {
+              required: "Account is required",
+            })}
+          >
+            <option value="">Select Account</option>
+            {accounts.map((acc) => (
+              <option key={acc.id} value={acc.id}>
+                {acc.name} ({acc.type})
+              </option>
+            ))}
+          </select>
+          <p className="text-red-500 text-sm mt-1">{errors.accountId?.message}</p>
+        </div>
       </div>
 
       {/* Date */}
       <div>
-        <label className="block mb-2 font-medium">
-          Date
-        </label>
-
+        <label className="block mb-2 font-medium">Date</label>
         <input
           type="date"
           className="w-full border rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500"
@@ -150,18 +144,12 @@ const IncomeForm = ({ income, onClose }) => {
             required: "Date is required",
           })}
         />
-
-        <p className="text-red-500 text-sm mt-1">
-          {errors.date?.message}
-        </p>
+        <p className="text-red-500 text-sm mt-1">{errors.date?.message}</p>
       </div>
 
       {/* Notes */}
       <div>
-        <label className="block mb-2 font-medium">
-          Notes
-        </label>
-
+        <label className="block mb-2 font-medium">Notes</label>
         <textarea
           rows="3"
           placeholder="Optional notes..."
@@ -182,7 +170,7 @@ const IncomeForm = ({ income, onClose }) => {
 
         <button
           type="submit"
-          className="px-5 py-2 bg-primary text-white rounded-lg hover:bg-blue-700"
+          className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
         >
           {income ? "Update Income" : "Save Income"}
         </button>

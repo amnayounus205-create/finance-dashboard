@@ -6,8 +6,12 @@ import {
   ArrowLeftRight,
   PiggyBank,
   BarChart3,
+  Landmark,
   User,
   LogOut,
+  RefreshCw,
+  Target,
+  FileText,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
@@ -16,10 +20,14 @@ function Sidebar() {
 
   const menuItems = [
     { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+    { name: "Accounts", path: "/accounts", icon: Landmark },
     { name: "Income", path: "/income", icon: Wallet },
     { name: "Expenses", path: "/expenses", icon: Receipt },
     { name: "Transactions", path: "/transactions", icon: ArrowLeftRight },
     { name: "Budgets", path: "/budgets", icon: PiggyBank },
+    { name: "Recurring", path: "/recurring", icon: RefreshCw },
+    { name: "Goals", path: "/goals", icon: Target },
+    { name: "Invoices", path: "/invoices", icon: FileText },
     { name: "Reports", path: "/reports", icon: BarChart3 },
     { name: "Profile", path: "/profile", icon: User },
   ];
@@ -30,7 +38,7 @@ function Sidebar() {
         💰 Finance
       </div>
 
-      <nav className="flex-1 p-4 space-y-2">
+      <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
         {menuItems.map((item) => {
           const Icon = item.icon;
 
@@ -55,7 +63,7 @@ function Sidebar() {
 
       <button
         onClick={logout}
-        className="m-4 flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 rounded-lg py-3"
+        className="m-4 flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 rounded-lg py-3 transition"
       >
         <LogOut size={18} />
         Logout

@@ -1,4 +1,5 @@
 import { useForm } from "react-hook-form";
+import { useFinance } from "../../context/FinanceContext";
 
 const EXPENSE_CATEGORIES = [
   "Food",
@@ -20,6 +21,8 @@ const PAYMENT_METHODS = [
 ];
 
 const ExpenseForm = ({ onSubmit, initialData = null, onCancel }) => {
+  const { accounts = [] } = useFinance();
+
   const {
     register,
     handleSubmit,
@@ -30,6 +33,7 @@ const ExpenseForm = ({ onSubmit, initialData = null, onCancel }) => {
       amount: "",
       category: "Food",
       paymentMethod: "Cash",
+      accountId: accounts[0]?.id || "",
       date: new Date().toISOString().split("T")[0],
       notes: "",
     },
@@ -106,6 +110,27 @@ const ExpenseForm = ({ onSubmit, initialData = null, onCancel }) => {
             ))}
           </select>
         </div>
+      </div>
+
+      {/* Account Selection */}
+      <div>
+        <label className="block text-sm font-medium text-secondary mb-1">
+          Deduct from Account
+        </label>
+        <select
+          {...register("accountId", { required: "Account is required" })}
+          className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+        >
+          <option value="">Select Account</option>
+          {accounts.map((acc) => (
+            <option key={acc.id} value={acc.id}>
+              {acc.name} ({acc.type}) - Balance: ${acc.balance}
+            </option>
+          ))}
+        </select>
+        {errors.accountId && (
+          <p className="text-red-500 text-xs mt-1">{errors.accountId.message}</p>
+        )}
       </div>
 
       {/* Date */}
