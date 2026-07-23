@@ -12,6 +12,8 @@ import {
   RefreshCw,
   Target,
   FileText,
+  Users,
+  History, // <-- 1. Import Activity Logs Icon
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
@@ -29,6 +31,8 @@ function Sidebar() {
     { name: "Goals", path: "/goals", icon: Target },
     { name: "Invoices", path: "/invoices", icon: FileText },
     { name: "Reports", path: "/reports", icon: BarChart3 },
+    { name: "User Roles", path: "/users", icon: Users },
+    { name: "Activity Logs", path: "/activity-logs", icon: History }, // <-- 2. Add Activity Logs Menu Item Here
     { name: "Profile", path: "/profile", icon: User },
   ];
 

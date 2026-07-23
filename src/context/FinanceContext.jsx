@@ -37,53 +37,86 @@ export const FinanceProvider = ({ children }) => {
     setStoredData(state);
   }, [state]);
 
+  // Activity Logs State & Helper
+  const [activityLogs, setActivityLogs] = useLocalStorage("finance_activity_logs", [
+    { 
+      id: 1, 
+      action: "Login History", 
+      description: "User logged into the dashboard successfully.", 
+      time: new Date().toLocaleString(), 
+      type: "login" 
+    }
+  ]);
+
+  const logActivity = (action, description, type = "general") => {
+    const newLog = {
+      id: Date.now(),
+      action,
+      description,
+      time: new Date().toLocaleString(),
+      type,
+    };
+    setActivityLogs((prev) => [newLog, ...(prev || [])]);
+  };
+
   // Profile Management
   const updateProfile = (profileData) => {
     dispatch({ type: "UPDATE_PROFILE", payload: profileData });
+    logActivity("Updated Profile", "User profile details were updated.", "profile");
   };
 
   // Multi-Account Management
   const addAccount = (account) => {
     dispatch({ type: "ADD_ACCOUNT", payload: { ...account, id: Date.now().toString() } });
+    logActivity("Added Account", `Created new account: '${account.name}'.`, "account");
   };
 
   const updateAccount = (account) => {
     dispatch({ type: "UPDATE_ACCOUNT", payload: account });
+    logActivity("Updated Account", `Updated account details for '${account.name}'.`, "account");
   };
 
   const deleteAccount = (id) => {
     dispatch({ type: "DELETE_ACCOUNT", payload: id });
+    logActivity("Deleted Account", "Removed an account from the dashboard.", "account");
   };
 
   // Income CRUD
   const addIncome = (income) => {
     dispatch({ type: "ADD_INCOME", payload: income });
+    logActivity("Added Income", `Recorded income of $${income.amount} (${income.title || income.source || 'General'}).`, "income");
   };
 
   const updateIncome = (income) => {
     dispatch({ type: "UPDATE_INCOME", payload: income });
+    logActivity("Updated Income", `Updated income record amounting to $${income.amount}.`, "income");
   };
 
   const deleteIncome = (id) => {
     dispatch({ type: "DELETE_INCOME", payload: id });
+    logActivity("Deleted Income", "Removed an income transaction record.", "income");
   };
 
   // Expense CRUD
   const addExpense = (expense) => {
     dispatch({ type: "ADD_EXPENSE", payload: expense });
+    logActivity("Added Expense", `Recorded expense of $${expense.amount} for '${expense.title || expense.category || 'General'}'.`, "expense");
   };
 
   const updateExpense = (expense) => {
     dispatch({ type: "UPDATE_EXPENSE", payload: expense });
+    logActivity("Updated Expense", `Updated expense record amounting to $${expense.amount}.`, "expense");
   };
 
   const deleteExpense = (id) => {
     dispatch({ type: "DELETE_EXPENSE", payload: id });
+    logActivity("Deleted Expense", "Removed an expense transaction record.", "expense");
   };
 
   // Recurring Transactions CRUD & Auto-Generator
   const addRecurring = (item) => {
     dispatch({ type: "ADD_RECURRING", payload: item });
+    logActivity("Created Recurring", `Added recurring bill/income: '${item.title}'.`, "recurring");
   };
 
   const updateRecurring = (item) => {
@@ -92,6 +125,7 @@ export const FinanceProvider = ({ children }) => {
 
   const deleteRecurring = (id) => {
     dispatch({ type: "DELETE_RECURRING", payload: id });
+    logActivity("Deleted Recurring", "Removed a recurring transaction setup.", "recurring");
   };
 
   useEffect(() => {
@@ -145,48 +179,59 @@ export const FinanceProvider = ({ children }) => {
   // Goals CRUD & Contribution
   const addGoal = (goal) => {
     dispatch({ type: "ADD_GOAL", payload: goal });
+    logActivity("Created Goal", `Created a new savings goal: '${goal.title || goal.name}'.`, "goal");
   };
 
   const updateGoal = (goal) => {
     dispatch({ type: "UPDATE_GOAL", payload: goal });
+    logActivity("Updated Goal", `Updated details for savings goal: '${goal.title || goal.name}'.`, "goal");
   };
 
   const deleteGoal = (id) => {
     dispatch({ type: "DELETE_GOAL", payload: id });
+    logActivity("Deleted Goal", "Removed a savings goal.", "goal");
   };
 
   const contributeToGoal = (goalId, amount) => {
     dispatch({ type: "CONTRIBUTE_GOAL", payload: { goalId, amount } });
+    logActivity("Goal Contribution", `Added $${amount} contribution to a savings goal.`, "goal");
   };
 
   // Invoices CRUD & Status Toggle
   const addInvoice = (invoice) => {
     dispatch({ type: "ADD_INVOICE", payload: invoice });
+    logActivity("Created Invoice", `Generated invoice for '${invoice.clientName || 'Client'}'.`, "invoice");
   };
 
   const updateInvoice = (invoice) => {
     dispatch({ type: "UPDATE_INVOICE", payload: invoice });
+    logActivity("Updated Invoice", "Updated invoice details.", "invoice");
   };
 
   const deleteInvoice = (id) => {
     dispatch({ type: "DELETE_INVOICE", payload: id });
+    logActivity("Deleted Invoice", "Removed an invoice record.", "invoice");
   };
 
   const toggleInvoiceStatus = (id) => {
     dispatch({ type: "TOGGLE_INVOICE_STATUS", payload: id });
+    logActivity("Invoice Status", "Toggled status of an invoice.", "invoice");
   };
 
   // Budget CRUD
   const addBudget = (budget) => {
     dispatch({ type: "ADD_BUDGET", payload: budget });
+    logActivity("Created Budget", `Set a new budget limit for '${budget.category}'.`, "budget");
   };
 
   const updateBudget = (budget) => {
     dispatch({ type: "UPDATE_BUDGET", payload: budget });
+    logActivity("Updated Budget", `Modified budget limit for '${budget.category}'.`, "budget");
   };
 
   const deleteBudget = (id) => {
     dispatch({ type: "DELETE_BUDGET", payload: id });
+    logActivity("Deleted Budget", "Removed a budget category limit.", "budget");
   };
 
   // Calculations

@@ -1,9 +1,9 @@
 import { useState, useMemo } from "react";
-import { Search, Filter, ArrowUpDown, Trash2, Edit2, AlertTriangle, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Filter, Trash2, AlertTriangle, ChevronLeft, ChevronRight, X, Calendar, Tag } from "lucide-react";
 import { useFinance } from "../context/FinanceContext";
 
 const Transactions = () => {
-  const { incomes = [], expenses = [], deleteIncome, deleteExpense, updateIncome, updateExpense } = useFinance();
+  const { incomes = [], expenses = [], deleteIncome, deleteExpense } = useFinance();
 
   // Search & Filter States
   const [searchQuery, setSearchQuery] = useState("");
@@ -24,8 +24,14 @@ const Transactions = () => {
   const allTransactions = useMemo(() => {
     const formattedIncomes = incomes.map((item) => ({ ...item, type: "income" }));
     const formattedExpenses = expenses.map((item) => ({ ...item, type: "expense" }));
-    return [...formattedIncomes, [...formattedExpenses]].flat();
+    return [...formattedIncomes, ...formattedExpenses];
   }, [incomes, expenses]);
+
+  // Extract unique categories dynamically from all transactions
+  const uniqueCategories = useMemo(() => {
+    const categories = allTransactions.map((item) => item.category).filter(Boolean);
+    return ["all", ...new Set(categories)];
+  }, [allTransactions]);
 
   // Filter and Sort Logic
   const filteredTransactions = useMemo(() => {
@@ -65,6 +71,17 @@ const Transactions = () => {
     return filteredTransactions.slice(start, start + itemsPerPage);
   }, [filteredTransactions, currentPage]);
 
+  // Reset All Filters
+  const handleResetFilters = () => {
+    setSearchQuery("");
+    setTypeFilter("all");
+    setCategoryFilter("all");
+    setStartDate("");
+    setEndDate("");
+    setSortBy("date-desc");
+    setCurrentPage(1);
+  };
+
   // Handle Delete Confirmation
   const confirmDelete = () => {
     if (deleteModal.type === "income") {
@@ -78,22 +95,31 @@ const Transactions = () => {
   return (
     <div className="space-y-8 pb-10">
       {/* Page Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-secondary">Transactions History</h1>
-        <p className="text-gray-500 mt-1">
-          Search, filter, and manage all your income and expense records.
-        </p>
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-secondary">Transactions History</h1>
+          <p className="text-gray-500 mt-1">
+            Search, filter, and manage all your income and expense records.
+          </p>
+        </div>
+        <button
+          onClick={handleResetFilters}
+          className="flex items-center gap-1.5 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl transition"
+        >
+          <X size={14} /> Clear All Filters
+        </button>
       </div>
 
       {/* Filters Bar */}
       <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 space-y-4">
-        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-          {/* Search Bar */}
-          <div className="relative w-full md:w-80">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          {/* 1. Global Search Bar */}
+          <div className="relative">
             <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
-              placeholder="Search by title, source, notes..."
+              placeholder="Search title, source, notes..."
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
@@ -103,31 +129,88 @@ const Transactions = () => {
             />
           </div>
 
-          {/* Type & Sort Filters */}
-          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+          {/* 2. Category Filter */}
+          <div className="relative">
+            <Tag size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+            <select
+              value={categoryFilter}
+              onChange={(e) => {
+                setCategoryFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 capitalize"
+            >
+              <option value="all">All Categories</option>
+              {uniqueCategories.filter(cat => cat !== "all").map((cat, idx) => (
+                <option key={idx} value={cat}>{cat}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* 3. Type Filter */}
+          <div>
             <select
               value={typeFilter}
               onChange={(e) => {
                 setTypeFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="px-4 py-2 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="all">All Types</option>
+              <option value="all">All Types (Income & Expense)</option>
               <option value="income">Income Only</option>
               <option value="expense">Expense Only</option>
             </select>
+          </div>
 
+          {/* 4. Sort By */}
+          <div>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-4 py-2 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="date-desc">Newest First</option>
               <option value="date-asc">Oldest First</option>
               <option value="amount-desc">Highest Amount</option>
               <option value="amount-asc">Lowest Amount</option>
             </select>
+          </div>
+
+        </div>
+
+        {/* Date Range Filters Row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-gray-100">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-gray-400 whitespace-nowrap">Start Date:</span>
+            <div className="relative w-full">
+              <Calendar size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => {
+                  setStartDate(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="w-full pl-9 pr-3 py-1.5 border border-gray-200 rounded-xl text-xs bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-gray-400 whitespace-nowrap">End Date:</span>
+            <div className="relative w-full">
+              <Calendar size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => {
+                  setEndDate(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="w-full pl-9 pr-3 py-1.5 border border-gray-200 rounded-xl text-xs bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
           </div>
         </div>
       </div>

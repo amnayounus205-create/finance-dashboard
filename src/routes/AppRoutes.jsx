@@ -12,7 +12,9 @@ import Accounts from "../pages/Accounts";
 import Recurring from "../pages/Recurring";
 import Goals from "../pages/Goals";
 import Invoices from "../pages/Invoices";
-import Notifications from "../pages/Notifications"; // <-- 1. Import Notifications Page
+import Notifications from "../pages/Notifications";
+import UsersPage from "../pages/Users";
+import ActivityLogs from "../pages/ActivityLogs"; // <-- 1. Import Activity Logs Page
 
 import ProtectedRoute from "../components/ProtectedRoute";
 import DashboardLayout from "../components/layout/DashboardLayout";
@@ -35,7 +37,9 @@ function AppRoutes() {
           <Route path="/goals" element={<Goals />} />
           <Route path="/invoices" element={<Invoices />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/notifications" element={<Notifications />} /> {/* <-- 2. Add Route Here */}
+          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/users" element={<UsersPage />} />
+          <Route path="/activity-logs" element={<ActivityLogs />} /> {/* <-- 2. Add Activity Logs Route Here */}
         </Route>
       </Route>
 
