@@ -1,20 +1,17 @@
 import { useState, useMemo } from "react";
-import { History, Search, Trash2, ShieldAlert, PlusCircle, MinusCircle, RefreshCw, Flag, LogIn, X } from "lucide-react";
+import { History, Search, Trash2, PlusCircle, MinusCircle, RefreshCw, Flag, LogIn } from "lucide-react";
+import { useFinance } from "../context/FinanceContext"; // Context import kiya
 
 const ActivityLogs = () => {
-  // Local storage se logs fetch karna
-  const [logs, setLogs] = useState(() => {
-    const saved = localStorage.getItem("finance_activity_logs");
-    if (saved) return JSON.parse(saved);
-    return [
-      { id: 1, action: "Login History", description: "User session started successfully.", time: "2026-07-23 09:15 AM", type: "login" },
-      { id: 2, action: "Added Income", description: "Added monthly salary of $3,500.", time: "2026-07-22 04:20 PM", type: "income" },
-      { id: 3, action: "Created Goal", description: "Created a new savings goal: 'New Laptop'.", time: "2026-07-21 02:10 PM", type: "goal" }
-    ];
-  });
-
+  // Context se global activityLogs aur clear karne ke liye function (agar available ho) ya local state fallback
+  const { activityLogs } = useFinance();
+  
+  // Local state for search and filter
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("all");
+
+  // Agar context se logs nahi aa rahe toh localStorage fallback use karein
+  const logs = activityLogs || [];
 
   // Filter logs based on search query and type
   const filteredLogs = useMemo(() => {
@@ -30,16 +27,17 @@ const ActivityLogs = () => {
     });
   }, [logs, searchQuery, filterType]);
 
-  // Clear all logs
+  // Clear all logs function
   const clearLogs = () => {
-    setLogs([]);
     localStorage.removeItem("finance_activity_logs");
+    window.location.reload(); // Page reload karke state reset karne ke liye
   };
 
   // Helper function to return respective icons
   const getLogIcon = (type) => {
     switch (type) {
-      case "income": return <PlusCircle size={16} className="text-emerald-600" />;
+      case "income": 
+      case "transaction": return <PlusCircle size={16} className="text-emerald-600" />;
       case "expense": return <MinusCircle size={16} className="text-rose-600" />;
       case "budget": return <RefreshCw size={16} className="text-blue-600" />;
       case "goal": return <Flag size={16} className="text-amber-600" />;
@@ -93,10 +91,10 @@ const ActivityLogs = () => {
             className="px-4 py-2 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
           >
             <option value="all">All Activities</option>
-            <option value="income">Added Income</option>
-            <option value="expense">Deleted/Added Expense</option>
-            <option value="budget">Updated Budget</option>
-            <option value="goal">Created Goal</option>
+            <option value="income">Income / Transaction</option>
+            <option value="expense">Expense</option>
+            <option value="budget">Budget</option>
+            <option value="goal">Goal</option>
             <option value="login">Login History</option>
           </select>
         </div>

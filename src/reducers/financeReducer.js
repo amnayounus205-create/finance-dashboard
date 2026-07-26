@@ -317,10 +317,11 @@ export const financeReducer = (state, action) => {
       };
 
     // ===========================
-    // Load Local Storage
+    // Load Local Storage / Undo & Redo
     // ===========================
 
     case "SET_DATA":
+    case "SET_FULL_STATE":
       return action.payload;
 
     default:

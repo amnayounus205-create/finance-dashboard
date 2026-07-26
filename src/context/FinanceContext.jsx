@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useReducer } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useReducer, useState } from "react";
 import { financeReducer, initialState } from "../reducers/financeReducer";
 import useLocalStorage from "../hooks/useLocalStorage";
 import {
@@ -6,6 +6,7 @@ import {
   calculateRemainingBudget,
   calculateTotal,
 } from "../utils/calculations";
+import { Wifi, WifiOff, RefreshCw } from "lucide-react";
 
 const FinanceContext = createContext();
 
@@ -33,15 +34,98 @@ export const FinanceProvider = ({ children }) => {
 
   const [state, dispatch] = useReducer(financeReducer, storedData);
 
+  // --- THEME CUSTOMIZATION STATE (Globalized) ---
+  const [currentTheme, setCurrentTheme] = useState(() => {
+    return localStorage.getItem("app_theme") || "light";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("app_theme", currentTheme);
+  }, [currentTheme]);
+
+  // --- UNDO / REDO HISTORY STATES ---
+  const [past, setPast] = useState([]);
+  const [future, setFuture] = useState([]);
+
+  // --- OFFLINE SUPPORT & SYNC STATES ---
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [pendingSyncCount, setPendingSyncCount] = useState(0);
+
+  // Monitor network status
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      triggerDummySync();
+    };
+
+    const handleOffline = () => {
+      setIsOnline(false);
+    };
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
+
+  // Dummy Sync Implementation when internet comes back
+  const triggerDummySync = () => {
+    setIsSyncing(true);
+    setTimeout(() => {
+      setIsSyncing(false);
+      setPendingSyncCount(0);
+      localStorage.setItem("finance_synced_timestamp", new Date().toISOString());
+      logActivity("Sync Complete", "Offline cached data successfully synchronized with server.", "system");
+    }, 1500);
+  };
+
+  const dispatchWithHistory = (action) => {
+    setPast(prev => [...prev, state]);
+    setFuture([]);
+    dispatch(action);
+
+    // Track pending sync changes if offline
+    if (!navigator.onLine) {
+      setPendingSyncCount(prev => prev + 1);
+    }
+  };
+
+  const undo = () => {
+    if (past.length === 0) return;
+    const previousState = past[past.length - 1];
+    const newPast = past.slice(0, past.length - 1);
+
+    setFuture(prev => [state, ...prev]);
+    setPast(newPast);
+    dispatch({ type: "SET_FULL_STATE", payload: previousState });
+  };
+
+  const redo = () => {
+    if (future.length === 0) return;
+    const nextState = future[0];
+    const newFuture = future.slice(1);
+
+    setPast(prev => [...prev, state]);
+    setFuture(newFuture);
+    dispatch({ type: "SET_FULL_STATE", payload: nextState });
+  };
+
+  const canUndo = past.length > 0;
+  const canRedo = future.length > 0;
+
   useEffect(() => {
     setStoredData(state);
   }, [state]);
 
-  // Activity Logs State & Helper
+  // Activity / Audit Logs State & Helper using useLocalStorage
   const [activityLogs, setActivityLogs] = useLocalStorage("finance_activity_logs", [
     { 
       id: 1, 
-      action: "Login History", 
+      action: "Login", 
       description: "User logged into the dashboard successfully.", 
       time: new Date().toLocaleString(), 
       type: "login" 
@@ -59,72 +143,81 @@ export const FinanceProvider = ({ children }) => {
     setActivityLogs((prev) => [newLog, ...(prev || [])]);
   };
 
+  // Auth Helpers for Audit Logging
+  const loginUser = () => {
+    logActivity("Login", "User logged into the dashboard successfully.", "login");
+  };
+
+  const logoutUser = () => {
+    logActivity("Logout", "User logged out from the dashboard successfully.", "logout");
+  };
+
   // Profile Management
   const updateProfile = (profileData) => {
-    dispatch({ type: "UPDATE_PROFILE", payload: profileData });
+    dispatchWithHistory({ type: "UPDATE_PROFILE", payload: profileData });
     logActivity("Updated Profile", "User profile details were updated.", "profile");
   };
 
   // Multi-Account Management
   const addAccount = (account) => {
-    dispatch({ type: "ADD_ACCOUNT", payload: { ...account, id: Date.now().toString() } });
+    dispatchWithHistory({ type: "ADD_ACCOUNT", payload: { ...account, id: Date.now().toString() } });
     logActivity("Added Account", `Created new account: '${account.name}'.`, "account");
   };
 
   const updateAccount = (account) => {
-    dispatch({ type: "UPDATE_ACCOUNT", payload: account });
+    dispatchWithHistory({ type: "UPDATE_ACCOUNT", payload: account });
     logActivity("Updated Account", `Updated account details for '${account.name}'.`, "account");
   };
 
   const deleteAccount = (id) => {
-    dispatch({ type: "DELETE_ACCOUNT", payload: id });
+    dispatchWithHistory({ type: "DELETE_ACCOUNT", payload: id });
     logActivity("Deleted Account", "Removed an account from the dashboard.", "account");
   };
 
   // Income CRUD
   const addIncome = (income) => {
-    dispatch({ type: "ADD_INCOME", payload: income });
-    logActivity("Added Income", `Recorded income of $${income.amount} (${income.title || income.source || 'General'}).`, "income");
+    dispatchWithHistory({ type: "ADD_INCOME", payload: income });
+    logActivity("Added Transaction", `Recorded income of $${income.amount} (${income.title || income.source || 'General'}).`, "transaction");
   };
 
   const updateIncome = (income) => {
-    dispatch({ type: "UPDATE_INCOME", payload: income });
-    logActivity("Updated Income", `Updated income record amounting to $${income.amount}.`, "income");
+    dispatchWithHistory({ type: "UPDATE_INCOME", payload: income });
+    logActivity("Updated Transaction", `Updated income record amounting to $${income.amount}.`, "transaction");
   };
 
   const deleteIncome = (id) => {
-    dispatch({ type: "DELETE_INCOME", payload: id });
-    logActivity("Deleted Income", "Removed an income transaction record.", "income");
+    dispatchWithHistory({ type: "DELETE_INCOME", payload: id });
+    logActivity("Deleted Transaction", "Removed an income transaction record.", "transaction");
   };
 
   // Expense CRUD
   const addExpense = (expense) => {
-    dispatch({ type: "ADD_EXPENSE", payload: expense });
-    logActivity("Added Expense", `Recorded expense of $${expense.amount} for '${expense.title || expense.category || 'General'}'.`, "expense");
+    dispatchWithHistory({ type: "ADD_EXPENSE", payload: expense });
+    logActivity("Added Transaction", `Recorded expense of $${expense.amount} for '${expense.title || expense.category || 'General'}'.`, "transaction");
   };
 
   const updateExpense = (expense) => {
-    dispatch({ type: "UPDATE_EXPENSE", payload: expense });
-    logActivity("Updated Expense", `Updated expense record amounting to $${expense.amount}.`, "expense");
+    dispatchWithHistory({ type: "UPDATE_EXPENSE", payload: expense });
+    logActivity("Updated Transaction", `Updated expense record amounting to $${expense.amount}.`, "transaction");
   };
 
   const deleteExpense = (id) => {
-    dispatch({ type: "DELETE_EXPENSE", payload: id });
+    dispatchWithHistory({ type: "DELETE_EXPENSE", payload: id });
     logActivity("Deleted Expense", "Removed an expense transaction record.", "expense");
   };
 
-  // Recurring Transactions CRUD & Auto-Generator
+  // Recurring Transactions CRUD
   const addRecurring = (item) => {
-    dispatch({ type: "ADD_RECURRING", payload: item });
+    dispatchWithHistory({ type: "ADD_RECURRING", payload: item });
     logActivity("Created Recurring", `Added recurring bill/income: '${item.title}'.`, "recurring");
   };
 
   const updateRecurring = (item) => {
-    dispatch({ type: "UPDATE_RECURRING", payload: item });
+    dispatchWithHistory({ type: "UPDATE_RECURRING", payload: item });
   };
 
   const deleteRecurring = (id) => {
-    dispatch({ type: "DELETE_RECURRING", payload: id });
+    dispatchWithHistory({ type: "DELETE_RECURRING", payload: id });
     logActivity("Deleted Recurring", "Removed a recurring transaction setup.", "recurring");
   };
 
@@ -176,61 +269,61 @@ export const FinanceProvider = ({ children }) => {
     }
   }, []);
 
-  // Goals CRUD & Contribution
+  // Goals CRUD
   const addGoal = (goal) => {
-    dispatch({ type: "ADD_GOAL", payload: goal });
+    dispatchWithHistory({ type: "ADD_GOAL", payload: goal });
     logActivity("Created Goal", `Created a new savings goal: '${goal.title || goal.name}'.`, "goal");
   };
 
   const updateGoal = (goal) => {
-    dispatch({ type: "UPDATE_GOAL", payload: goal });
+    dispatchWithHistory({ type: "UPDATE_GOAL", payload: goal });
     logActivity("Updated Goal", `Updated details for savings goal: '${goal.title || goal.name}'.`, "goal");
   };
 
   const deleteGoal = (id) => {
-    dispatch({ type: "DELETE_GOAL", payload: id });
+    dispatchWithHistory({ type: "DELETE_GOAL", payload: id });
     logActivity("Deleted Goal", "Removed a savings goal.", "goal");
   };
 
   const contributeToGoal = (goalId, amount) => {
-    dispatch({ type: "CONTRIBUTE_GOAL", payload: { goalId, amount } });
+    dispatchWithHistory({ type: "CONTRIBUTE_GOAL", payload: { goalId, amount } });
     logActivity("Goal Contribution", `Added $${amount} contribution to a savings goal.`, "goal");
   };
 
-  // Invoices CRUD & Status Toggle
+  // Invoices CRUD
   const addInvoice = (invoice) => {
-    dispatch({ type: "ADD_INVOICE", payload: invoice });
+    dispatchWithHistory({ type: "ADD_INVOICE", payload: invoice });
     logActivity("Created Invoice", `Generated invoice for '${invoice.clientName || 'Client'}'.`, "invoice");
   };
 
   const updateInvoice = (invoice) => {
-    dispatch({ type: "UPDATE_INVOICE", payload: invoice });
+    dispatchWithHistory({ type: "UPDATE_INVOICE", payload: invoice });
     logActivity("Updated Invoice", "Updated invoice details.", "invoice");
   };
 
   const deleteInvoice = (id) => {
-    dispatch({ type: "DELETE_INVOICE", payload: id });
+    dispatchWithHistory({ type: "DELETE_INVOICE", payload: id });
     logActivity("Deleted Invoice", "Removed an invoice record.", "invoice");
   };
 
   const toggleInvoiceStatus = (id) => {
-    dispatch({ type: "TOGGLE_INVOICE_STATUS", payload: id });
+    dispatchWithHistory({ type: "TOGGLE_INVOICE_STATUS", payload: id });
     logActivity("Invoice Status", "Toggled status of an invoice.", "invoice");
   };
 
   // Budget CRUD
   const addBudget = (budget) => {
-    dispatch({ type: "ADD_BUDGET", payload: budget });
-    logActivity("Created Budget", `Set a new budget limit for '${budget.category}'.`, "budget");
+    dispatchWithHistory({ type: "ADD_BUDGET", payload: budget });
+    logActivity("Updated Budget", `Set a new budget limit for '${budget.category}'.`, "budget");
   };
 
   const updateBudget = (budget) => {
-    dispatch({ type: "UPDATE_BUDGET", payload: budget });
+    dispatchWithHistory({ type: "UPDATE_BUDGET", payload: budget });
     logActivity("Updated Budget", `Modified budget limit for '${budget.category}'.`, "budget");
   };
 
   const deleteBudget = (id) => {
-    dispatch({ type: "DELETE_BUDGET", payload: id });
+    dispatchWithHistory({ type: "DELETE_BUDGET", payload: id });
     logActivity("Deleted Budget", "Removed a budget category limit.", "budget");
   };
 
@@ -251,12 +344,9 @@ export const FinanceProvider = ({ children }) => {
     );
   }, [state.incomes, state.expenses]);
 
-  // Dynamic Live Notifications Count Calculation
   const activeNotificationsCount = useMemo(() => {
     let count = 0;
-    const today = new Date();
 
-    // 1. Budgets exceeded check
     (state.budgets || []).forEach((budget) => {
       const spent = (state.expenses || [])
         .filter(exp => exp.category?.toLowerCase() === budget.category?.toLowerCase())
@@ -264,29 +354,8 @@ export const FinanceProvider = ({ children }) => {
       if (spent >= Number(budget.limit)) count++;
     });
 
-    // 2. Upcoming bills / recurring check
-    (state.recurring || []).forEach((item) => {
-      const checkDate = item.nextRunDate || item.nextDate;
-      if (checkDate && item.type === "Expense") {
-        const diffDays = Math.ceil((new Date(checkDate) - today) / (1000 * 60 * 60 * 24));
-        if (diffDays >= 0 && diffDays <= 3) count++;
-      }
-    });
-
-    // 3. Low balance check (< 1000)
-    (state.accounts || []).forEach((acc) => {
-      if (Number(acc.balance || 0) < 1000) count++;
-    });
-
-    // 4. Goals achieved check
-    (state.goals || []).forEach((goal) => {
-      const current = Number(goal.currentAmount || goal.current || 0);
-      const target = Number(goal.targetAmount || goal.target || 0);
-      if (current >= target && target > 0) count++;
-    });
-
     return count;
-  }, [state.budgets, state.expenses, state.recurring, state.accounts, state.goals]);
+  }, [state.budgets, state.expenses]);
 
   return (
     <FinanceContext.Provider
@@ -298,14 +367,22 @@ export const FinanceProvider = ({ children }) => {
         recurring: state.recurring || [],
         goals: state.goals || [],
         invoices: state.invoices || [],
-        userProfile: state.userProfile || {
-          name: "John Doe",
-          email: "john.doe@example.com",
-          currency: "USD",
-          notifications: true,
-        },
+        activityLogs,
+        userProfile: state.userProfile || {},
+        currentTheme,     // <--- Global Theme state passed here
+        setCurrentTheme,  // <--- Global Theme updater passed here
         transactions,
         activeNotificationsCount,
+        isOnline,
+        isSyncing,
+        pendingSyncCount,
+        undo,
+        redo,
+        canUndo,
+        canRedo,
+        logActivity,
+        loginUser,
+        logoutUser,
         updateProfile,
         addAccount,
         updateAccount,
@@ -338,6 +415,23 @@ export const FinanceProvider = ({ children }) => {
         monthlySavings,
       }}
     >
+      {/* Floating Offline/Sync Status Indicator */}
+      <div className="fixed bottom-6 right-6 z-[9999] pointer-events-none">
+        {isSyncing ? (
+          <div className="flex items-center gap-2 px-4 py-2 bg-amber-500 text-white text-sm font-bold rounded-full shadow-lg animate-pulse">
+            <RefreshCw size={16} className="animate-spin" /> Syncing with server...
+          </div>
+        ) : !isOnline ? (
+          <div className="flex items-center gap-2 px-4 py-2 bg-rose-600 text-white text-sm font-bold rounded-full shadow-lg animate-bounce">
+            <WifiOff size={16} /> Offline (Local Changes: {pendingSyncCount})
+          </div>
+        ) : pendingSyncCount > 0 && !isSyncing ? (
+          <div className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-sm font-bold rounded-full shadow-lg">
+            <Wifi size={16} /> Online ({pendingSyncCount} changes synced)
+          </div>
+        ) : null}
+      </div>
+
       {children}
     </FinanceContext.Provider>
   );
