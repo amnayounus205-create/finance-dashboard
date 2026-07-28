@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
+import { useFinance } from "../../context/FinanceContext";
 
 const BudgetForm = ({ onSubmit, initialData, onCancel }) => {
+  const { currencySymbol } = useFinance();
   const [category, setCategory] = useState("Food");
   const [limit, setLimit] = useState("");
   const [month, setMonth] = useState("");
@@ -45,7 +47,9 @@ const BudgetForm = ({ onSubmit, initialData, onCancel }) => {
       </div>
 
       <div>
-        <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">Monthly Limit ($)</label>
+        <label className="block text-xs font-semibold text-gray-600 uppercase mb-1">
+          Monthly Limit ({currencySymbol})
+        </label>
         <input
           type="number"
           required

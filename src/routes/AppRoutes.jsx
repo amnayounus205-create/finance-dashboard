@@ -7,6 +7,7 @@ import Expenses from "../pages/Expenses";
 import Transactions from "../pages/Transactions";
 import Budgets from "../pages/Budgets";
 import Reports from "../pages/Reports";
+import RecurringBills from "../pages/RecurringBills";
 import Profile from "../pages/Profile";
 import Accounts from "../pages/Accounts";
 import Recurring from "../pages/Recurring";
@@ -14,8 +15,8 @@ import Goals from "../pages/Goals";
 import Invoices from "../pages/Invoices";
 import Notifications from "../pages/Notifications";
 import UsersPage from "../pages/Users";
-import ActivityLogs from "../pages/ActivityLogs"; // <-- 1. Import Activity Logs Page
-
+import ActivityLogs from "../pages/ActivityLogs";
+import CalendarModule from "../pages/Calendar"; // 👈 Fixed import path
 import ProtectedRoute from "../components/ProtectedRoute";
 import DashboardLayout from "../components/layout/DashboardLayout";
 
@@ -39,7 +40,9 @@ function AppRoutes() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/users" element={<UsersPage />} />
-          <Route path="/activity-logs" element={<ActivityLogs />} /> {/* <-- 2. Add Activity Logs Route Here */}
+          <Route path="/recurring-bills" element={<RecurringBills />} />
+          <Route path="/calendar" element={<CalendarModule />} />
+          <Route path="/activity-logs" element={<ActivityLogs />} />
         </Route>
       </Route>
 

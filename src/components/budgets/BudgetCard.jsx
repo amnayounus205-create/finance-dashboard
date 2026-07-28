@@ -1,6 +1,6 @@
 import { Edit2, Trash2 } from "lucide-react";
 
-const BudgetCard = ({ budget, spent = 0, onEdit, onDelete }) => {
+const BudgetCard = ({ budget, spent = 0, currencySymbol = "$", onEdit, onDelete }) => {
   const limit = Number(budget.limit || 0);
   const remaining = limit - spent;
   const percentage = limit > 0 ? Math.min(Math.round((spent / limit) * 100), 100) : 0;
@@ -39,11 +39,11 @@ const BudgetCard = ({ budget, spent = 0, onEdit, onDelete }) => {
       <div className="flex justify-between items-baseline">
         <div>
           <p className="text-xs text-gray-400 uppercase font-medium">Limit</p>
-          <h2 className="text-xl font-bold text-secondary">${limit.toFixed(2)}</h2>
+          <h2 className="text-xl font-bold text-secondary">{currencySymbol}{limit.toFixed(2)}</h2>
         </div>
         <div className="text-right">
           <p className="text-xs text-gray-400 uppercase font-medium">Spent</p>
-          <h2 className="text-xl font-bold text-red-500">${spent.toFixed(2)}</h2>
+          <h2 className="text-xl font-bold text-red-500">{currencySymbol}{spent.toFixed(2)}</h2>
         </div>
       </div>
 
@@ -52,7 +52,7 @@ const BudgetCard = ({ budget, spent = 0, onEdit, onDelete }) => {
         <div className="flex justify-between text-xs font-medium">
           <span className="text-gray-500">Usage: {percentage}%</span>
           <span className={remaining < 0 ? "text-red-500 font-bold" : "text-green-600"}>
-            Remaining: ${remaining.toFixed(2)}
+            Remaining: {currencySymbol}{remaining.toFixed(2)}
           </span>
         </div>
         <div className="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden">

@@ -13,7 +13,8 @@ import {
   Target,
   FileText,
   Users,
-  History, // <-- 1. Import Activity Logs Icon
+  History,
+  CalendarDays,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
@@ -23,16 +24,18 @@ function Sidebar() {
   const menuItems = [
     { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
     { name: "Accounts", path: "/accounts", icon: Landmark },
+    { name: "Calendar", path: "/calendar", icon: CalendarDays }, // 👈 Calendar added here
     { name: "Income", path: "/income", icon: Wallet },
     { name: "Expenses", path: "/expenses", icon: Receipt },
     { name: "Transactions", path: "/transactions", icon: ArrowLeftRight },
     { name: "Budgets", path: "/budgets", icon: PiggyBank },
     { name: "Recurring", path: "/recurring", icon: RefreshCw },
+    { name: "Recurring Bills", path: "/recurring-bills", icon: CalendarDays },
     { name: "Goals", path: "/goals", icon: Target },
     { name: "Invoices", path: "/invoices", icon: FileText },
     { name: "Reports", path: "/reports", icon: BarChart3 },
     { name: "User Roles", path: "/users", icon: Users },
-    { name: "Activity Logs", path: "/activity-logs", icon: History }, // <-- 2. Add Activity Logs Menu Item Here
+    { name: "Activity Logs", path: "/activity-logs", icon: History },
     { name: "Profile", path: "/profile", icon: User },
   ];
 

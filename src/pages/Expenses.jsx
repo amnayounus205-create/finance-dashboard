@@ -4,7 +4,7 @@ import ExpenseModal from "../components/expenses/ExpenseModal";
 import { useFinance } from "../context/FinanceContext";
 
 const Expenses = () => {
-  const { expenses = [], addExpense, updateExpense, deleteExpense } = useFinance();
+  const { expenses = [], currencySymbol, addExpense, updateExpense, deleteExpense } = useFinance();
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
@@ -71,7 +71,7 @@ const Expenses = () => {
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">Total Expenses</p>
             <h2 className="mt-2 text-2xl font-bold text-red-500">
-              -${totalExpenseAmount.toFixed(2)}
+              -{currencySymbol}{totalExpenseAmount.toFixed(2)}
             </h2>
           </div>
           <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center">
@@ -172,7 +172,7 @@ const Expenses = () => {
                     <td className="py-4 px-6 text-gray-600">{expense.paymentMethod}</td>
                     <td className="py-4 px-6 text-gray-500">{expense.date}</td>
                     <td className="py-4 px-6 font-bold text-red-500">
-                      -${Number(expense.amount).toFixed(2)}
+                      -{currencySymbol}{Number(expense.amount).toFixed(2)}
                     </td>
                     <td className="py-4 px-6 text-right space-x-2">
                       <button

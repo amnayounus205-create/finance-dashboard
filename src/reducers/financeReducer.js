@@ -10,6 +10,13 @@ export const initialState = {
   recurring: [],
   goals: [],
   invoices: [],
+  tags: [
+    { id: "1", name: "Food", color: "bg-orange-100 text-orange-700" },
+    { id: "2", name: "Office", color: "bg-blue-100 text-blue-700" },
+    { id: "3", name: "Family", color: "bg-purple-100 text-purple-700" },
+    { id: "4", name: "Business", color: "bg-emerald-100 text-emerald-700" },
+    { id: "5", name: "Travel", color: "bg-pink-100 text-pink-700" },
+  ],
   userProfile: {
     name: "John Doe",
     email: "john.doe@example.com",
@@ -19,31 +26,30 @@ export const initialState = {
 };
 
 export const financeReducer = (state, action) => {
-  switch (action.type) {
-    // ===========================
-    // Profile
-    // ===========================
+  // Ensure base arrays always exist
+  const accounts = state?.accounts || [];
+  const incomes = state?.incomes || [];
+  const expenses = state?.expenses || [];
+  const budgets = state?.budgets || [];
+  const tags = state?.tags || [];
 
+  switch (action.type) {
+    
     case "UPDATE_PROFILE":
       return {
         ...state,
         userProfile: action.payload,
       };
-
-    // ===========================
-    // Accounts
-    // ===========================
-
     case "ADD_ACCOUNT":
       return {
         ...state,
-        accounts: [...state.accounts, action.payload],
+        accounts: [...accounts, action.payload],
       };
 
     case "UPDATE_ACCOUNT":
       return {
         ...state,
-        accounts: state.accounts.map((account) =>
+        accounts: accounts.map((account) =>
           account.id === action.payload.id ? action.payload : account
         ),
       };
@@ -51,14 +57,26 @@ export const financeReducer = (state, action) => {
     case "DELETE_ACCOUNT":
       return {
         ...state,
-        accounts: state.accounts.filter(
+        accounts: accounts.filter(
           (account) => account.id !== action.payload
         ),
       };
 
-    // ===========================
-    // Recurring Transactions
-    // ===========================
+    
+
+    case "ADD_TAG":
+      return {
+        ...state,
+        tags: [...tags, action.payload],
+      };
+
+    case "DELETE_TAG":
+      return {
+        ...state,
+        tags: tags.filter((tag) => tag.id !== action.payload),
+      };
+
+    
 
     case "ADD_RECURRING":
       return {
@@ -80,9 +98,7 @@ export const financeReducer = (state, action) => {
         recurring: (state.recurring || []).filter((item) => item.id !== action.payload),
       };
 
-    // ===========================
-    // Financial Goals
-    // ===========================
+  
 
     case "ADD_GOAL":
       return {
@@ -122,9 +138,7 @@ export const financeReducer = (state, action) => {
       };
     }
 
-    // ===========================
-    // Invoice Management
-    // ===========================
+    
 
     case "ADD_INVOICE":
       return {
@@ -156,13 +170,11 @@ export const financeReducer = (state, action) => {
         ),
       };
 
-    // ===========================
-    // Income (Auto Balance Update)
-    // ===========================
+   
 
     case "ADD_INCOME": {
       const newIncome = action.payload;
-      const updatedAccounts = state.accounts.map((acc) => {
+      const updatedAccounts = accounts.map((acc) => {
         if (acc.id === newIncome.accountId) {
           return { ...acc, balance: Number(acc.balance) + Number(newIncome.amount) };
         }
@@ -171,16 +183,16 @@ export const financeReducer = (state, action) => {
 
       return {
         ...state,
-        incomes: [...state.incomes, newIncome],
+        incomes: [...incomes, newIncome],
         accounts: updatedAccounts,
       };
     }
 
     case "UPDATE_INCOME": {
       const updatedIncome = action.payload;
-      const oldIncome = state.incomes.find((inc) => inc.id === updatedIncome.id);
+      const oldIncome = incomes.find((inc) => inc.id === updatedIncome.id);
 
-      const updatedAccounts = state.accounts.map((acc) => {
+      const updatedAccounts = accounts.map((acc) => {
         if (oldIncome && oldIncome.accountId === updatedIncome.accountId && acc.id === updatedIncome.accountId) {
           return {
             ...acc,
@@ -200,7 +212,7 @@ export const financeReducer = (state, action) => {
 
       return {
         ...state,
-        incomes: state.incomes.map((income) =>
+        incomes: incomes.map((income) =>
           income.id === updatedIncome.id ? updatedIncome : income
         ),
         accounts: updatedAccounts,
@@ -208,8 +220,8 @@ export const financeReducer = (state, action) => {
     }
 
     case "DELETE_INCOME": {
-      const incomeToDelete = state.incomes.find((inc) => inc.id === action.payload);
-      const updatedAccounts = state.accounts.map((acc) => {
+      const incomeToDelete = incomes.find((inc) => inc.id === action.payload);
+      const updatedAccounts = accounts.map((acc) => {
         if (incomeToDelete && acc.id === incomeToDelete.accountId) {
           return { ...acc, balance: Number(acc.balance) - Number(incomeToDelete.amount) };
         }
@@ -218,18 +230,15 @@ export const financeReducer = (state, action) => {
 
       return {
         ...state,
-        incomes: state.incomes.filter((income) => income.id !== action.payload),
+        incomes: incomes.filter((income) => income.id !== action.payload),
         accounts: updatedAccounts,
       };
     }
 
-    // ===========================
-    // Expense (Auto Balance Update)
-    // ===========================
-
+    
     case "ADD_EXPENSE": {
       const newExpense = action.payload;
-      const updatedAccounts = state.accounts.map((acc) => {
+      const updatedAccounts = accounts.map((acc) => {
         if (acc.id === newExpense.accountId) {
           return { ...acc, balance: Number(acc.balance) - Number(newExpense.amount) };
         }
@@ -238,16 +247,16 @@ export const financeReducer = (state, action) => {
 
       return {
         ...state,
-        expenses: [...state.expenses, newExpense],
+        expenses: [...expenses, newExpense],
         accounts: updatedAccounts,
       };
     }
 
     case "UPDATE_EXPENSE": {
       const updatedExpense = action.payload;
-      const oldExpense = state.expenses.find((exp) => exp.id === updatedExpense.id);
+      const oldExpense = expenses.find((exp) => exp.id === updatedExpense.id);
 
-      const updatedAccounts = state.accounts.map((acc) => {
+      const updatedAccounts = accounts.map((acc) => {
         if (oldExpense && oldExpense.accountId === updatedExpense.accountId && acc.id === updatedExpense.accountId) {
           return {
             ...acc,
@@ -267,7 +276,7 @@ export const financeReducer = (state, action) => {
 
       return {
         ...state,
-        expenses: state.expenses.map((expense) =>
+        expenses: expenses.map((expense) =>
           expense.id === updatedExpense.id ? updatedExpense : expense
         ),
         accounts: updatedAccounts,
@@ -275,8 +284,8 @@ export const financeReducer = (state, action) => {
     }
 
     case "DELETE_EXPENSE": {
-      const expenseToDelete = state.expenses.find((exp) => exp.id === action.payload);
-      const updatedAccounts = state.accounts.map((acc) => {
+      const expenseToDelete = expenses.find((exp) => exp.id === action.payload);
+      const updatedAccounts = accounts.map((acc) => {
         if (expenseToDelete && acc.id === expenseToDelete.accountId) {
           return { ...acc, balance: Number(acc.balance) + Number(expenseToDelete.amount) };
         }
@@ -285,25 +294,23 @@ export const financeReducer = (state, action) => {
 
       return {
         ...state,
-        expenses: state.expenses.filter((expense) => expense.id !== action.payload),
+        expenses: expenses.filter((expense) => expense.id !== action.payload),
         accounts: updatedAccounts,
       };
     }
 
-    // ===========================
-    // Budget
-    // ===========================
+   
 
     case "ADD_BUDGET":
       return {
         ...state,
-        budgets: [...state.budgets, action.payload],
+        budgets: [...budgets, action.payload],
       };
 
     case "UPDATE_BUDGET":
       return {
         ...state,
-        budgets: state.budgets.map((budget) =>
+        budgets: budgets.map((budget) =>
           budget.id === action.payload.id ? action.payload : budget
         ),
       };
@@ -311,18 +318,23 @@ export const financeReducer = (state, action) => {
     case "DELETE_BUDGET":
       return {
         ...state,
-        budgets: state.budgets.filter(
+        budgets: budgets.filter(
           (budget) => budget.id !== action.payload
         ),
       };
 
-    // ===========================
-    // Load Local Storage / Undo & Redo
-    // ===========================
+  
 
     case "SET_DATA":
     case "SET_FULL_STATE":
-      return action.payload;
+      return {
+        ...initialState,
+        ...(action.payload || {}),
+        accounts: action.payload?.accounts || initialState.accounts,
+        incomes: action.payload?.incomes || initialState.incomes,
+        expenses: action.payload?.expenses || initialState.expenses,
+        tags: action.payload?.tags || initialState.tags,
+      };
 
     default:
       return state;

@@ -5,7 +5,7 @@ import BudgetForm from "../components/budgets/BudgetForm";
 import { useFinance } from "../context/FinanceContext";
 
 const Budgets = () => {
-  const { budgets = [], expenses = [], addBudget, updateBudget, deleteBudget } = useFinance();
+  const { budgets = [], expenses = [], currencySymbol, addBudget, updateBudget, deleteBudget } = useFinance();
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBudget, setEditingBudget] = useState(null);
@@ -85,6 +85,7 @@ const Budgets = () => {
                 key={budget.id}
                 budget={budget}
                 spent={spent}
+                currencySymbol={currencySymbol}
                 onEdit={handleEdit}
                 onDelete={(id) => setDeleteId(id)}
               />

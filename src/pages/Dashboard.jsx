@@ -18,7 +18,20 @@ import {
   Eye,
   EyeOff,
   GripVertical,
-  Check
+  Check,
+  Clock,
+  LogIn,
+  LogOut,
+  User,
+  CreditCard,
+  FileText,
+  RefreshCw,
+  Edit3,
+  Trash2,
+  DollarSign,
+  Plus,
+  PieChart as PieIcon,
+  X
 } from "lucide-react";
 import { 
   ResponsiveContainer, 
@@ -41,7 +54,202 @@ const defaultCardsConfig = [
   { id: "charts", title: "Charts Section", visible: true },
   { id: "transactions", title: "Recent Transactions", visible: true },
   { id: "upcoming_bills", title: "Upcoming Bills", visible: true },
+  { id: "timeline", title: "Recent Activity Timeline", visible: true },
 ];
+
+// Activity Icon Helper
+const getActivityIcon = (type, action) => {
+  switch (type) {
+    case "login":
+    case "logout":
+      return <LogIn size={16} className="text-emerald-500" />;
+    case "transaction":
+      return <DollarSign size={16} className="text-blue-500" />;
+    case "budget":
+      return <Edit3 size={16} className="text-amber-500" />;
+    case "goal":
+      return <Target size={16} className="text-purple-500" />;
+    case "account":
+      return <CreditCard size={16} className="text-indigo-500" />;
+    case "invoice":
+      return <FileText size={16} className="text-teal-500" />;
+    case "profile":
+      return <User size={16} className="text-pink-500" />;
+    case "system":
+      return <RefreshCw size={16} className="text-cyan-500" />;
+    default:
+      if (action?.includes("Deleted")) return <Trash2 size={16} className="text-rose-500" />;
+      return <Clock size={16} className="text-gray-400" />;
+  }
+};
+
+// --- QUICK ACTION MODAL COMPONENT (Direct Form Popup) ---
+function QuickActionModal({ type, onClose, onSave }) {
+  const [formData, setFormData] = useState({
+    title: "",
+    amount: "",
+    category: type === "Income" ? "Salary" : "Food",
+    date: new Date().toISOString().split("T")[0],
+    targetAmount: "",
+    currentAmount: "",
+    deadline: "",
+    period: "Monthly"
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!formData.amount) return;
+
+    if (type === "Income" || type === "Expense") {
+      onSave("transaction", {
+        id: Date.now().toString(),
+        title: formData.title || (type === "Income" ? "Income" : "Expense"),
+        amount: Number(formData.amount),
+        type: type,
+        category: formData.category,
+        date: formData.date
+      });
+    } else if (type === "Budget") {
+      onSave("budget", {
+        id: Date.now().toString(),
+        category: formData.category,
+        limit: Number(formData.amount),
+        period: formData.period
+      });
+    } else if (type === "Goal") {
+      onSave("goal", {
+        id: Date.now().toString(),
+        title: formData.title || "New Goal",
+        targetAmount: Number(formData.targetAmount || formData.amount),
+        currentAmount: Number(formData.currentAmount || 0),
+        deadline: formData.deadline || formData.date
+      });
+    }
+    onClose();
+  };
+
+  const titles = {
+    Income: "Add New Income",
+    Expense: "Add New Expense",
+    Budget: "Create Budget Limit",
+    Goal: "Add Financial Goal"
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-2xl max-w-md w-full p-6 shadow-xl space-y-5 animate-in fade-in zoom-in-95 duration-150">
+        <div className="flex items-center justify-between border-b border-gray-100 dark:border-slate-700 pb-3">
+          <h3 className="text-lg font-bold">{titles[type]}</h3>
+          <button onClick={onClose} className="p-1 rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700">
+            <X size={18} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {(type === "Income" || type === "Expense" || type === "Goal") && (
+            <div>
+              <label className="block text-xs font-semibold mb-1 opacity-70">Title / Source Name</label>
+              <input
+                type="text"
+                required
+                placeholder={type === "Goal" ? "e.g., Buy Laptop" : "e.g., Freelance / Grocery"}
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          )}
+
+          <div>
+            <label className="block text-xs font-semibold mb-1 opacity-70">
+              {type === "Goal" ? "Target Amount" : type === "Budget" ? "Budget Limit Amount" : "Amount"}
+            </label>
+            <input
+              type="number"
+              required
+              step="any"
+              placeholder="0.00"
+              value={formData.amount}
+              onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+              className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          {(type === "Income" || type === "Expense" || type === "Budget") && (
+            <div>
+              <label className="block text-xs font-semibold mb-1 opacity-70">Category</label>
+              <select
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                {type === "Income" ? (
+                  <>
+                    <option value="Salary">Salary</option>
+                    <option value="Freelance">Freelance</option>
+                    <option value="Investments">Investments</option>
+                    <option value="Other">Other</option>
+                  </>
+                ) : (
+                  <>
+                    <option value="Food">Food & Dining</option>
+                    <option value="Bills">Utilities & Bills</option>
+                    <option value="Shopping">Shopping</option>
+                    <option value="Transport">Transport</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="General">General</option>
+                  </>
+                )}
+              </select>
+            </div>
+          )}
+
+          {type === "Goal" && (
+            <div>
+              <label className="block text-xs font-semibold mb-1 opacity-70">Target Deadline</label>
+              <input
+                type="date"
+                required
+                value={formData.deadline}
+                onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          )}
+
+          {(type === "Income" || type === "Expense") && (
+            <div>
+              <label className="block text-xs font-semibold mb-1 opacity-70">Date</label>
+              <input
+                type="date"
+                required
+                value={formData.date}
+                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          )}
+
+          <div className="flex justify-end gap-3 pt-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-xl transition"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition shadow-sm"
+            >
+              Save {type}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
 
 // --- DASHBOARD CUSTOMIZER MODAL COMPONENT ---
 function DashboardCustomizer({ cardsConfig, setCardsConfig, onClose }) {
@@ -146,17 +354,19 @@ function DashboardCustomizer({ cardsConfig, setCardsConfig, onClose }) {
 function Dashboard() {
   const { 
     transactions = [], 
-    budgets = [], 
-    goals = [], 
     recurring = [], 
     totalIncome = 0, 
     totalExpense = 0, 
     totalBalance = 0, 
     userProfile,
+    activityLogs = [],
     undo,
     redo,
     canUndo,
-    canRedo
+    canRedo,
+    addTransaction,
+    addBudget,
+    addGoal
   } = useFinance();
 
   const currencySymbol = userProfile?.currency === "EUR" ? "€" : userProfile?.currency === "GBP" ? "£" : userProfile?.currency === "PKR" ? "₨" : userProfile?.currency === "INR" ? "₹" : "$";
@@ -177,6 +387,21 @@ function Dashboard() {
   });
 
   const [isCustomizerOpen, setIsCustomizerOpen] = useState(false);
+  
+  // --- QUICK ACTIONS FAB & MODAL STATE ---
+  const [isFabOpen, setIsFabOpen] = useState(false);
+  const [activeModalType, setActiveModalType] = useState(null); // "Income" | "Expense" | "Budget" | "Goal" | null
+
+  // Handle direct save from modal
+  const handleQuickSave = (targetType, data) => {
+    if (targetType === "transaction" && typeof addTransaction === "function") {
+      addTransaction(data);
+    } else if (targetType === "budget" && typeof addBudget === "function") {
+      addBudget(data);
+    } else if (targetType === "goal" && typeof addGoal === "function") {
+      addGoal(data);
+    }
+  };
 
   // Theme configuration styles map
   const themeStyles = {
@@ -450,13 +675,50 @@ function Dashboard() {
           </div>
         );
 
+      case "timeline":
+        return (
+          <div key="timeline" className={`p-6 rounded-2xl shadow-sm border ${activeTheme.card}`}>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-lg font-bold">Recent Activity Timeline</h3>
+                <p className="text-xs opacity-60">Track your recent actions & system logs</p>
+              </div>
+              <span className="text-xs opacity-60 font-semibold">{activityLogs.length} Events</span>
+            </div>
+
+            {activityLogs.length === 0 ? (
+              <p className="text-xs opacity-60 text-center py-6">No recent activity recorded yet.</p>
+            ) : (
+              <div className="relative border-l border-gray-200 dark:border-slate-700 ml-3 space-y-6 py-2">
+                {activityLogs.slice(0, 10).map((item) => (
+                  <div key={item.id} className="relative pl-6 group">
+                    <div className="absolute -left-3.5 top-0.5 flex h-7 w-7 items-center justify-center rounded-full bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 shadow-xs transition group-hover:scale-110">
+                      {getActivityIcon(item.type, item.action)}
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <p className="text-sm font-semibold">{item.action}</p>
+                        <p className="text-xs opacity-60 mt-0.5">{item.description}</p>
+                      </div>
+                      <span className="text-[10px] opacity-50 mt-1 sm:mt-0 font-medium">
+                        {item.time}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+
       default:
         return null;
     }
   };
 
   return (
-    <div className={`min-h-screen p-4 md:p-8 transition-colors duration-300 ${activeTheme.bg}`}>
+    <div className={`min-h-screen p-4 md:p-8 transition-colors duration-300 relative ${activeTheme.bg}`}>
       <div className="max-w-7xl mx-auto space-y-8">
         
         {/* --- THEME CUSTOMIZER, DASHBOARD CUSTOMIZER & UNDO/REDO HEADER BAR --- */}
@@ -535,6 +797,74 @@ function Dashboard() {
         </div>
 
       </div>
+
+      {/* --- FLOATING QUICK ACTIONS (FAB) --- */}
+      <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3">
+        {/* Expanded Quick Action Items (Opens Forms Directly) */}
+        {isFabOpen && (
+          <div className="flex flex-col items-end gap-2.5 animate-in fade-in slide-in-from-bottom-3 duration-200">
+            <button
+              onClick={() => { setActiveModalType("Income"); setIsFabOpen(false); }}
+              className="flex items-center gap-2.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl shadow-lg text-xs font-bold transition-all transform hover:scale-105"
+            >
+              <span>Add Income</span>
+              <div className="w-7 h-7 rounded-xl bg-white/20 flex items-center justify-center">
+                <ArrowUpRight size={14} />
+              </div>
+            </button>
+
+            <button
+              onClick={() => { setActiveModalType("Expense"); setIsFabOpen(false); }}
+              className="flex items-center gap-2.5 px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-2xl shadow-lg text-xs font-bold transition-all transform hover:scale-105"
+            >
+              <span>Add Expense</span>
+              <div className="w-7 h-7 rounded-xl bg-white/20 flex items-center justify-center">
+                <ArrowDownLeft size={14} />
+              </div>
+            </button>
+
+            <button
+              onClick={() => { setActiveModalType("Budget"); setIsFabOpen(false); }}
+              className="flex items-center gap-2.5 px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-2xl shadow-lg text-xs font-bold transition-all transform hover:scale-105"
+            >
+              <span>Create Budget</span>
+              <div className="w-7 h-7 rounded-xl bg-white/20 flex items-center justify-center">
+                <PieIcon size={14} />
+              </div>
+            </button>
+
+            <button
+              onClick={() => { setActiveModalType("Goal"); setIsFabOpen(false); }}
+              className="flex items-center gap-2.5 px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl shadow-lg text-xs font-bold transition-all transform hover:scale-105"
+            >
+              <span>Add Goal</span>
+              <div className="w-7 h-7 rounded-xl bg-white/20 flex items-center justify-center">
+                <Target size={14} />
+              </div>
+            </button>
+          </div>
+        )}
+
+        {/* Main Floating Trigger Button */}
+        <button
+          onClick={() => setIsFabOpen(!isFabOpen)}
+          className={`w-14 h-14 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white shadow-xl flex items-center justify-center transition-all transform hover:scale-105 active:scale-95 ${
+            isFabOpen ? "rotate-45 bg-slate-700 hover:bg-slate-800" : ""
+          }`}
+          title="Quick Actions"
+        >
+          <Plus size={26} />
+        </button>
+      </div>
+
+      {/* --- DIRECT FORM MODAL POPUP --- */}
+      {activeModalType && (
+        <QuickActionModal
+          type={activeModalType}
+          onClose={() => setActiveModalType(null)}
+          onSave={handleQuickSave}
+        />
+      )}
 
       {/* --- CUSTOMIZER MODAL --- */}
       {isCustomizerOpen && (

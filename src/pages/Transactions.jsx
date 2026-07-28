@@ -19,7 +19,8 @@ function Transactions() {
     updateTransactionCategory, 
     bulkDeleteTransactions, 
     bulkUpdateCategory,
-    userProfile 
+    userProfile,
+    tags = []
   } = useFinance();
 
   const currencySymbol = userProfile?.currency === "EUR" ? "€" : userProfile?.currency === "GBP" ? "£" : userProfile?.currency === "PKR" ? "₨" : userProfile?.currency === "INR" ? "₹" : "$";
@@ -28,6 +29,7 @@ function Transactions() {
   const [selectedIds, setSelectedIds] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedTag, setSelectedTag] = useState("All");
   
   // Target Category for Bulk Update
   const [targetCategory, setTargetCategory] = useState("General");
@@ -41,9 +43,10 @@ function Transactions() {
     return transactions.filter(tx => {
       const matchesSearch = (tx.title || tx.source || "").toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = selectedCategory === "All" || tx.category === selectedCategory;
-      return matchesSearch && matchesCategory;
+      const matchesTag = selectedTag === "All" || tx.tag === selectedTag;
+      return matchesSearch && matchesCategory && matchesTag;
     });
-  }, [transactions, searchQuery, selectedCategory]);
+  }, [transactions, searchQuery, selectedCategory, selectedTag]);
 
   // --- SELECT ALL / DESELECT ALL ---
   const handleSelectAll = (e) => {
@@ -128,7 +131,7 @@ function Transactions() {
     const itemsToExport = transactions.filter(tx => selectedIds.includes(tx.id));
     if (itemsToExport.length === 0) return;
 
-    const headers = ["ID", "Title/Source", "Type", "Category", "Amount", "Date"];
+    const headers = ["ID", "Title/Source", "Type", "Category", "Tag", "Amount", "Date"];
     const csvRows = [
       headers.join(","),
       ...itemsToExport.map(tx => [
@@ -136,6 +139,7 @@ function Transactions() {
         `"${tx.title || tx.source || "N/A"}"`,
         tx.type,
         `"${tx.category || "General"}"`,
+        `"${tx.tag || "None"}"`,
         tx.amount,
         tx.date
       ].join(","))
@@ -163,7 +167,7 @@ function Transactions() {
           </div>
         </div>
 
-        {/* Search Bar */}
+        {/* Search & Filters Bar */}
         <div className="p-4 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3 w-full md:w-auto flex-1">
             <div className="relative w-full md:w-72">
@@ -175,6 +179,22 @@ function Transactions() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+            </div>
+
+            {/* Tag Filter Dropdown */}
+            <div className="relative w-full md:w-48">
+              <select
+                value={selectedTag}
+                onChange={(e) => setSelectedTag(e.target.value)}
+                className="w-full px-3 py-2 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+              >
+                <option value="All">All Tags</option>
+                {tags.map((tag) => (
+                  <option key={tag.id} value={tag.name}>
+                    {tag.name}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         </div>
@@ -238,6 +258,7 @@ function Transactions() {
                   </th>
                   <th className="p-4">Transaction</th>
                   <th className="p-4">Category</th>
+                  <th className="p-4">Tag</th>
                   <th className="p-4">Date</th>
                   <th className="p-4 text-right">Amount</th>
                 </tr>
@@ -245,7 +266,7 @@ function Transactions() {
               <tbody className="divide-y divide-gray-100 dark:divide-slate-700 text-xs">
                 {filteredTransactions.length === 0 ? (
                   <tr>
-                    <td colSpan="5" className="text-center py-8 text-gray-400">
+                    <td colSpan="6" className="text-center py-8 text-gray-400">
                       Koi transactions nahi mili.
                     </td>
                   </tr>
@@ -278,6 +299,15 @@ function Transactions() {
                         </td>
                         <td className="p-4 font-medium text-gray-600 dark:text-gray-300">
                           {tx.category || "General"}
+                        </td>
+                        <td className="p-4">
+                          {tx.tag ? (
+                            <span className="px-2 py-1 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-300 font-semibold rounded-lg text-[10px]">
+                              {tx.tag}
+                            </span>
+                          ) : (
+                            <span className="text-gray-400 text-[10px]">-</span>
+                          )}
                         </td>
                         <td className="p-4 text-gray-500 dark:text-gray-400">
                           {tx.date}

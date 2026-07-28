@@ -7,7 +7,8 @@ import {
   Download,
   Search,
   X,
-  TrendingUp
+  TrendingUp,
+  Tag as TagIcon
 } from "lucide-react";
 
 import { useFinance } from "../context/FinanceContext";
@@ -17,11 +18,12 @@ import IncomeModal from "../components/income/IncomeModal";
 import IncomeTable from "../components/income/IncomeTable";
 
 const Income = () => {
-  const { incomes } = useFinance();
+  const { incomes, tags, currencySymbol } = useFinance();
 
   const [open, setOpen] = useState(false);
   const [selectedIncome, setSelectedIncome] = useState(null);
   const [search, setSearch] = useState("");
+  const [selectedTag, setSelectedTag] = useState("all");
 
   const handleAdd = () => {
     setSelectedIncome(null);
@@ -33,14 +35,23 @@ const Income = () => {
     setOpen(true);
   };
 
+  // Filter incomes based on search query AND selected tag dropdown
   const filteredIncome = useMemo(() => {
-    if (!search.trim()) return incomes;
-    const query = search.toLowerCase();
     return incomes.filter((item) => {
-      const text = `${item.source} ${item.category} ${item.notes || ""}`.toLowerCase();
-      return text.includes(query);
+      // Tag Filter Check
+      const matchesTag = 
+        selectedTag === "all" || 
+        item.tag?.toLowerCase() === selectedTag.toLowerCase();
+
+      // Search Query Check
+      const query = search.trim().toLowerCase();
+      const matchesSearch = 
+        !query || 
+        `${item.source || ""} ${item.category || ""} ${item.tag || ""} ${item.notes || ""}`.toLowerCase().includes(query);
+
+      return matchesTag && matchesSearch;
     });
-  }, [search, incomes]);
+  }, [search, selectedTag, incomes]);
 
   const totalIncome = useMemo(
     () => filteredIncome.reduce((sum, item) => sum + Number(item.amount || 0), 0),
@@ -60,10 +71,11 @@ const Income = () => {
   const exportCSV = () => {
     if (!filteredIncome.length) return;
 
-    const headers = ["Source", "Category", "Amount", "Date", "Notes"];
+    const headers = ["Source", "Category", "Tag", "Amount", "Date", "Notes"];
     const rows = filteredIncome.map((item) => [
       `"${item.source || ""}"`,
       `"${item.category || ""}"`,
+      `"${item.tag || ""}"`,
       item.amount,
       item.date,
       `"${item.notes || ""}"`
@@ -90,7 +102,7 @@ const Income = () => {
             Income Management
           </h1>
           <p className="mt-1 text-sm text-gray-500">
-            Track, filter, and export all your incoming cash flows.
+            Track, filter by tags, and export all your incoming cash flows.
           </p>
         </div>
 
@@ -124,7 +136,7 @@ const Income = () => {
                 Total Income
               </p>
               <h2 className="mt-2 text-2xl font-extrabold text-emerald-600 sm:text-3xl">
-                ${totalIncome.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                {currencySymbol}{totalIncome.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </h2>
             </div>
             <div className="rounded-xl bg-emerald-50 p-3 text-emerald-600">
@@ -158,7 +170,7 @@ const Income = () => {
                 Average Entry
               </p>
               <h2 className="mt-2 text-2xl font-extrabold text-purple-600 sm:text-3xl">
-                ${averageIncome.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                {currencySymbol}{averageIncome.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
               </h2>
             </div>
             <div className="rounded-xl bg-purple-50 p-3 text-purple-600">
@@ -175,7 +187,7 @@ const Income = () => {
                 Highest Single
               </p>
               <h2 className="mt-2 text-2xl font-extrabold text-amber-600 sm:text-3xl">
-                ${highestIncome.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                {currencySymbol}{highestIncome.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </h2>
             </div>
             <div className="rounded-xl bg-amber-50 p-3 text-amber-600">
@@ -185,17 +197,17 @@ const Income = () => {
         </Card>
       </div>
 
-      {/* Main Table Container with Integrated Search Bar */}
+      {/* Main Table Container with Search Bar and Tag Filter */}
       <Card className="overflow-hidden border border-gray-200 bg-white shadow-xs">
-        {/* Search Bar Header */}
-        <div className="border-b border-gray-100 p-4">
-          <div className="relative max-w-md">
+        <div className="flex flex-col gap-3 border-b border-gray-100 p-4 sm:flex-row sm:items-center sm:justify-between">
+          {/* Search Bar */}
+          <div className="relative max-w-md w-full">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
               <Search size={18} className="text-gray-400" />
             </div>
             <input
               type="text"
-              placeholder="Search by source, category, or notes..."
+              placeholder="Search by source, category, tag, or notes..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full rounded-lg border border-gray-200 bg-gray-50/50 py-2.5 pl-10 pr-10 text-sm outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/20"
@@ -208,6 +220,23 @@ const Income = () => {
                 <X size={16} />
               </button>
             )}
+          </div>
+
+          {/* Tag Filter Dropdown */}
+          <div className="flex items-center gap-2">
+            <TagIcon size={16} className="text-gray-400" />
+            <select
+              value={selectedTag}
+              onChange={(e) => setSelectedTag(e.target.value)}
+              className="rounded-lg border border-gray-200 bg-gray-50/50 px-3 py-2.5 text-sm outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/20"
+            >
+              <option value="all">All Tags</option>
+              {tags.map((tag) => (
+                <option key={tag.id || tag.name} value={tag.name}>
+                  {tag.name}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
