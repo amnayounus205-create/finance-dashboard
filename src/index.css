@@ -73,3 +73,12 @@ button {
   color: #ecfdf5 !important;
   border-color: #047857 !important;
 }
+
+/* ==========================================
+   FORCE ALL HEADINGS WHITE ACROSS ALL THEMES
+   ========================================== */
+.theme-dark h1, .theme-dark h2, .theme-dark h3, .theme-dark h4, .theme-dark h5, .theme-dark h6,
+.theme-blue h1, .theme-blue h2, .theme-blue h3, .theme-blue h4, .theme-blue h5, .theme-blue h6,
+.theme-green h1, .theme-green h2, .theme-green h3, .theme-green h4, .theme-green h5, .theme-green h6 {
+  color: #ffffff !important;
+}
