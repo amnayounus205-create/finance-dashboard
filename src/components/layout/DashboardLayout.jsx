@@ -6,8 +6,8 @@ import { useFinance } from "../../context/FinanceContext";
 // Theme styles configuration mapping
 const themeStyles = {
   light: {
-    bg: "bg-slate-100",
-    text: "text-slate-900",
+    bg: "bg-background", // tumhare tailwind config wala color
+    text: "text-secondary",
   },
   dark: {
     bg: "bg-slate-900",
@@ -28,14 +28,19 @@ function DashboardLayout() {
   const activeTheme = themeStyles[currentTheme] || themeStyles.light;
 
   return (
-    <div className={`flex min-h-screen ${activeTheme.bg} ${activeTheme.text} transition-colors duration-300`}>
-      <Sidebar />
+    // MOBILE FIRST: pehle column, md se row
+    <div className={`flex flex-col md:flex-row min-h-screen ${activeTheme.bg} ${activeTheme.text} font-inter transition-colors duration-300`}>
 
-      {/* Added theme class wrapper for automatic card/box styling */}
+      {/* SIDEBAR - Mobile: full width, Desktop: 64 */}
+      <aside className="w-full md:w-64 md:min-h-screen bg-card border-b md:border-b-0 md:border-r border-border flex-shrink-0">
+        <Sidebar />
+      </aside>
+
+      {/* RIGHT SIDE: Navbar + Main Content */}
       <div className={`flex-1 flex flex-col min-w-0 theme-${currentTheme}`}>
         <Navbar />
 
-        <main className="flex-1 p-6 overflow-y-auto">
+        <main className="flex-1 p-4 sm:p-5 md:p-6 lg:p-8 overflow-y-auto overflow-x-hidden">
           <Outlet />
         </main>
       </div>

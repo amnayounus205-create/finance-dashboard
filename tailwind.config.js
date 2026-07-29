@@ -2,9 +2,17 @@
 export default {
   content: [
     "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+    "./src/*/.{js,ts,jsx,tsx}",
   ],
   theme: {
+    // YE NAYI LINE ADD KI HAI - MOBILE KO DESKTOP BANA DIYA
+    screens: {
+      'sm': '1024px',
+      'md': '1024px', 
+      'lg': '1280px',
+      'xl': '1536px',
+      '2xl': '1536px',
+    },
     extend: {
       colors: {
         primary: "#2563EB",

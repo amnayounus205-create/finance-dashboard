@@ -1,12 +1,12 @@
 import { useMemo, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { 
-  ArrowUpRight, 
-  ArrowDownLeft, 
-  Wallet, 
-  Target, 
-  CalendarClock, 
-  TrendingUp, 
+import {
+  ArrowUpRight,
+  ArrowDownLeft,
+  Wallet,
+  Target,
+  CalendarClock,
+  TrendingUp,
   ArrowRight,
   CheckCircle2,
   Calendar,
@@ -32,16 +32,16 @@ import {
   PieChart as PieIcon,
   X
 } from "lucide-react";
-import { 
-  ResponsiveContainer, 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  Tooltip, 
-  PieChart, 
-  Pie, 
-  Cell 
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  PieChart,
+  Pie,
+  Cell
 } from "recharts";
 import { useFinance } from "../context/FinanceContext";
 
@@ -87,7 +87,7 @@ function QuickActionModal({ type, onClose, onSave }) {
   const [formData, setFormData] = useState({
     title: "",
     amount: "",
-    category: type === "Income" ? "Salary" : "Food",
+    category: type === "Income"? "Salary" : "Food",
     date: new Date().toISOString().split("T")[0],
     targetAmount: "",
     currentAmount: "",
@@ -102,7 +102,7 @@ function QuickActionModal({ type, onClose, onSave }) {
     if (type === "Income" || type === "Expense") {
       onSave("transaction", {
         id: Date.now().toString(),
-        title: formData.title || (type === "Income" ? "Income" : "Expense"),
+        title: formData.title || (type === "Income"? "Income" : "Expense"),
         amount: Number(formData.amount),
         type: type,
         category: formData.category,
@@ -136,8 +136,8 @@ function QuickActionModal({ type, onClose, onSave }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-2xl max-w-md w-full p-6 shadow-xl space-y-5 animate-in fade-in zoom-in-95 duration-150">
-        <div className="flex items-center justify-between border-b border-gray-100 dark:border-slate-700 pb-3">
+      <div className="bg-card rounded-2xl max-w-md w-full p-6 shadow-xl space-y-5 animate-in fade-in zoom-in-95 duration-150 border-border">
+        <div className="flex items-center justify-between border-b border-border pb-3">
           <h3 className="text-lg font-bold">{titles[type]}</h3>
           <button onClick={onClose} className="p-1 rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700">
             <X size={18} />
@@ -151,17 +151,17 @@ function QuickActionModal({ type, onClose, onSave }) {
               <input
                 type="text"
                 required
-                placeholder={type === "Goal" ? "e.g., Buy Laptop" : "e.g., Freelance / Grocery"}
+                placeholder={type === "Goal"? "e.g., Buy Laptop" : "e.g., Freelance / Grocery"}
                 value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onChange={(e) => setFormData({...formData, title: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
           )}
 
           <div>
             <label className="block text-xs font-semibold mb-1 opacity-70">
-              {type === "Goal" ? "Target Amount" : type === "Budget" ? "Budget Limit Amount" : "Amount"}
+              {type === "Goal"? "Target Amount" : type === "Budget"? "Budget Limit Amount" : "Amount"}
             </label>
             <input
               type="number"
@@ -169,8 +169,8 @@ function QuickActionModal({ type, onClose, onSave }) {
               step="any"
               placeholder="0.00"
               value={formData.amount}
-              onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => setFormData({...formData, amount: e.target.value })}
+              className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
 
@@ -179,10 +179,10 @@ function QuickActionModal({ type, onClose, onSave }) {
               <label className="block text-xs font-semibold mb-1 opacity-70">Category</label>
               <select
                 value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onChange={(e) => setFormData({...formData, category: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-xl border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
               >
-                {type === "Income" ? (
+                {type === "Income"? (
                   <>
                     <option value="Salary">Salary</option>
                     <option value="Freelance">Freelance</option>
@@ -210,8 +210,8 @@ function QuickActionModal({ type, onClose, onSave }) {
                 type="date"
                 required
                 value={formData.deadline}
-                onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onChange={(e) => setFormData({...formData, deadline: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
           )}
@@ -223,8 +223,8 @@ function QuickActionModal({ type, onClose, onSave }) {
                 type="date"
                 required
                 value={formData.date}
-                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onChange={(e) => setFormData({...formData, date: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
           )}
@@ -233,13 +233,13 @@ function QuickActionModal({ type, onClose, onSave }) {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-xl transition"
+              className="px-4 py-2 text-xs font-semibold opacity-70 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-xl transition"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition shadow-sm"
+              className="px-5 py-2 bg-primary hover:opacity-90 text-white text-xs font-semibold rounded-xl transition shadow-sm"
             >
               Save {type}
             </button>
@@ -256,13 +256,13 @@ function DashboardCustomizer({ cardsConfig, setCardsConfig, onClose }) {
 
   const toggleVisibility = (id) => {
     setLocalConfig((prev) =>
-      prev.map((card) => (card.id === id ? { ...card, visible: !card.visible } : card))
+      prev.map((card) => (card.id === id? {...card, visible:!card.visible } : card))
     );
   };
 
   const moveCard = (index, direction) => {
     const newConfig = [...localConfig];
-    const targetIndex = direction === "up" ? index - 1 : index + 1;
+    const targetIndex = direction === "up"? index - 1 : index + 1;
 
     if (targetIndex < 0 || targetIndex >= newConfig.length) return;
 
@@ -281,13 +281,13 @@ function DashboardCustomizer({ cardsConfig, setCardsConfig, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-2xl max-w-md w-full p-6 shadow-xl space-y-6">
+      <div className="bg-card rounded-2xl max-w-md w-full p-6 shadow-xl space-y-6 border-border">
         <div className="flex items-center justify-between">
           <h3 className="text-xl font-bold">Customize Dashboard</h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">✕</button>
         </div>
 
-        <p className="text-xs text-gray-500 dark:text-gray-400">
+        <p className="text-xs opacity-60">
           Cards ki visibility toggle karein aur upar/neeche move karke apna layout set karein.
         </p>
 
@@ -295,7 +295,7 @@ function DashboardCustomizer({ cardsConfig, setCardsConfig, onClose }) {
           {localConfig.map((card, index) => (
             <div
               key={card.id}
-              className="flex items-center justify-between p-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-100 dark:border-slate-700 rounded-xl"
+              className="flex items-center justify-between p-3 bg-background border-border rounded-xl"
             >
               <div className="flex items-center gap-3">
                 <GripVertical size={16} className="text-gray-400 cursor-grab" />
@@ -306,14 +306,14 @@ function DashboardCustomizer({ cardsConfig, setCardsConfig, onClose }) {
                 <button
                   onClick={() => moveCard(index, "up")}
                   disabled={index === 0}
-                  className="p-1 text-gray-500 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600 rounded disabled:opacity-30 text-xs"
+                  className="p-1 opacity-60 hover:bg-gray-200 dark:hover:bg-slate-600 rounded disabled:opacity-30 text-xs"
                 >
                   ▲
                 </button>
                 <button
                   onClick={() => moveCard(index, "down")}
                   disabled={index === localConfig.length - 1}
-                  className="p-1 text-gray-500 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600 rounded disabled:opacity-30 text-xs"
+                  className="p-1 opacity-60 hover:bg-gray-200 dark:hover:bg-slate-600 rounded disabled:opacity-30 text-xs"
                 >
                   ▼
                 </button>
@@ -321,10 +321,10 @@ function DashboardCustomizer({ cardsConfig, setCardsConfig, onClose }) {
                 <button
                   onClick={() => toggleVisibility(card.id)}
                   className={`p-1.5 rounded-lg transition ${
-                    card.visible ? "text-emerald-600 bg-emerald-50 dark:bg-emerald-950 dark:text-emerald-400" : "text-gray-400 bg-gray-200 dark:bg-slate-600"
+                    card.visible? "text-income bg-income/10" : "opacity-40 bg-gray-200 dark:bg-slate-600"
                   }`}
                 >
-                  {card.visible ? <Eye size={16} /> : <EyeOff size={16} />}
+                  {card.visible? <Eye size={16} /> : <EyeOff size={16} />}
                 </button>
               </div>
             </div>
@@ -334,13 +334,13 @@ function DashboardCustomizer({ cardsConfig, setCardsConfig, onClose }) {
         <div className="flex justify-end gap-3 pt-2">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-xl transition"
+            className="px-4 py-2 text-xs font-semibold opacity-70 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-xl transition"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
-            className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition shadow-sm"
+            className="flex items-center gap-1.5 px-4 py-2 bg-primary hover:opacity-90 text-white text-xs font-semibold rounded-xl transition shadow-sm"
           >
             <Check size={14} /> Save Layout
           </button>
@@ -351,12 +351,12 @@ function DashboardCustomizer({ cardsConfig, setCardsConfig, onClose }) {
 }
 
 function Dashboard() {
-  const { 
-    transactions = [], 
-    recurring = [], 
-    totalIncome = 0, 
-    totalExpense = 0, 
-    totalBalance = 0, 
+  const {
+    transactions = [],
+    recurring = [],
+    totalIncome = 0,
+    totalExpense = 0,
+    totalBalance = 0,
     userProfile,
     activityLogs = [],
     undo,
@@ -368,19 +368,19 @@ function Dashboard() {
     addGoal
   } = useFinance();
 
-  const currencySymbol = userProfile?.currency === "EUR" ? "€" : userProfile?.currency === "GBP" ? "£" : userProfile?.currency === "PKR" ? "₨" : userProfile?.currency === "INR" ? "₹" : "$";
+  const currencySymbol = userProfile?.currency === "EUR"? "€" : userProfile?.currency === "GBP"? "£" : userProfile?.currency === "PKR"? "₨" : userProfile?.currency === "INR"? "₹" : "$";
 
   // --- DASHBOARD LAYOUT CONFIG STATE ---
   const [cardsConfig, setCardsConfig] = useState(() => {
     const saved = localStorage.getItem("dashboard_cards_config");
-    return saved ? JSON.parse(saved) : defaultCardsConfig;
+    return saved? JSON.parse(saved) : defaultCardsConfig;
   });
 
   const [isCustomizerOpen, setIsCustomizerOpen] = useState(false);
-  
+
   // --- QUICK ACTIONS FAB & MODAL STATE ---
   const [isFabOpen, setIsFabOpen] = useState(false);
-  const [activeModalType, setActiveModalType] = useState(null); // "Income" | "Expense" | "Budget" | "Goal" | null
+  const [activeModalType, setActiveModalType] = useState(null);
 
   // Handle direct save from modal
   const handleQuickSave = (targetType, data) => {
@@ -412,7 +412,7 @@ function Dashboard() {
         if (tx.type === "Income") currInc += amount;
         if (tx.type === "Expense") currExp += amount;
       } else if (
-        (txMonth === currentMonth - 1 && txYear === currentYear) || 
+        (txMonth === currentMonth - 1 && txYear === currentYear) ||
         (currentMonth === 0 && txMonth === 11 && txYear === currentYear - 1)
       ) {
         if (tx.type === "Income") lastInc += amount;
@@ -438,8 +438,8 @@ function Dashboard() {
   const pieChartData = useMemo(() => {
     const categoryMap = {};
     transactions
-      .filter(tx => tx.type === "Expense")
-      .forEach(tx => {
+     .filter(tx => tx.type === "Expense")
+     .forEach(tx => {
         const cat = tx.category || "General";
         categoryMap[cat] = (categoryMap[cat] || 0) + Number(tx.amount || 0);
       });
@@ -448,12 +448,12 @@ function Dashboard() {
   }, [transactions]);
 
   const recentTransactions = useMemo(() => transactions.slice(0, 5), [transactions]);
-  
+
   const upcomingBills = useMemo(() => {
     const today = new Date();
     return (recurring || []).filter(item => {
       const checkDate = item.nextRunDate || item.nextDate;
-      if (!checkDate || item.type !== "Expense") return false;
+      if (!checkDate || item.type!== "Expense") return false;
       const diffDays = Math.ceil((new Date(checkDate) - today) / (1000 * 60 * 60 * 24));
       return diffDays >= 0 && diffDays <= 7;
     }).slice(0, 4);
@@ -464,43 +464,44 @@ function Dashboard() {
     switch (sectionId) {
       case "overview":
         return (
-          <div key="overview" className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-2xl shadow-sm border bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-slate-800 dark:text-slate-100 flex items-center justify-between">
+          // YEH LINE CHANGE KI: md:grid-cols-3 -> sm:grid-cols-2 lg:grid-cols-3
+          <div key="overview" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            <div className="p-4 md:p-6 rounded-card shadow-card border bg-card border-border flex items-center justify-between">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider opacity-60">Total Balance</p>
                 <h3 className="text-2xl font-bold mt-1">{currencySymbol}{totalBalance.toLocaleString()}</h3>
-                <span className="text-xs text-emerald-500 font-semibold flex items-center gap-1 mt-2">
+                <span className="text-xs text-income font-semibold flex items-center gap-1 mt-2">
                   <TrendingUp size={14} /> Overall Net Worth
                 </span>
               </div>
-              <div className="w-14 h-14 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center">
-                <Wallet size={28} />
+              <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+                <Wallet size={24} />
               </div>
             </div>
 
-            <div className="p-6 rounded-2xl shadow-sm border bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-slate-800 dark:text-slate-100 flex items-center justify-between">
+            <div className="p-4 md:p-6 rounded-card shadow-card border bg-card border-border flex items-center justify-between">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider opacity-60">Total Income</p>
-                <h3 className="text-2xl font-bold text-emerald-500 mt-1">{currencySymbol}{totalIncome.toLocaleString()}</h3>
+                <h3 className="text-2xl font-bold text-income mt-1">{currencySymbol}{totalIncome.toLocaleString()}</h3>
                 <span className="text-xs opacity-60 font-semibold flex items-center gap-1 mt-2">
-                  <ArrowUpRight size={14} className="text-emerald-500" /> Inflows recorded
+                  <ArrowUpRight size={14} className="text-income" /> Inflows recorded
                 </span>
               </div>
-              <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
-                <ArrowUpRight size={28} />
+              <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-income/10 text-income flex items-center justify-center">
+                <ArrowUpRight size={24} />
               </div>
             </div>
 
-            <div className="p-6 rounded-2xl shadow-sm border bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-slate-800 dark:text-slate-100 flex items-center justify-between">
+            <div className="p-4 md:p-6 rounded-card shadow-card border bg-card border-border flex items-center justify-between">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider opacity-60">Total Expenses</p>
-                <h3 className="text-2xl font-bold text-rose-500 mt-1">{currencySymbol}{totalExpense.toLocaleString()}</h3>
+                <h3 className="text-2xl font-bold text-expense mt-1">{currencySymbol}{totalExpense.toLocaleString()}</h3>
                 <span className="text-xs opacity-60 font-semibold flex items-center gap-1 mt-2">
-                  <ArrowDownLeft size={14} className="text-rose-500" /> Outflows recorded
+                  <ArrowDownLeft size={14} className="text-expense" /> Outflows recorded
                 </span>
               </div>
-              <div className="w-14 h-14 rounded-2xl bg-rose-500/10 text-rose-500 flex items-center justify-center">
-                <ArrowDownLeft size={28} />
+              <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-expense/10 text-expense flex items-center justify-center">
+                <ArrowDownLeft size={24} />
               </div>
             </div>
           </div>
@@ -508,38 +509,39 @@ function Dashboard() {
 
       case "charts":
         return (
-          <div key="charts" className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="p-6 rounded-2xl shadow-sm border bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-slate-800 dark:text-slate-100">
+          // YEH LINE CHANGE KI: lg:grid-cols-2
+          <div key="charts" className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+            <div className="p-4 md:p-6 rounded-card shadow-card border bg-card border-border">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h3 className="text-lg font-bold">Monthly Comparison Chart</h3>
                   <p className="text-xs opacity-60">Income vs Expenses Bar Comparison</p>
                 </div>
-                <Calendar size={20} className="text-blue-600 dark:text-blue-400" />
+                <Calendar size={20} className="text-primary" />
               </div>
-              <div className="h-72 w-full">
+              <div className="h-64 md:h-72 w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={comparisonBarData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                  <BarChart data={comparisonBarData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} />
                     <YAxis stroke="#94a3b8" fontSize={12} />
                     <Tooltip formatter={(value) => `${currencySymbol}${value.toLocaleString()}`} />
-                    <Bar dataKey="Income" fill="#10b981" radius={[6, 6, 0, 0]} />
-                    <Bar dataKey="Expense" fill="#ef4444" radius={[6, 6, 0, 0]} />
+                    <Bar dataKey="Income" fill="#22C55E" radius={[6, 6, 0, 0]} />
+                    <Bar dataKey="Expense" fill="#EF4444" radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
             </div>
 
-            <div className="p-6 rounded-2xl shadow-sm border bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-slate-800 dark:text-slate-100">
+            <div className="p-4 md:p-6 rounded-card shadow-card border bg-card border-border">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h3 className="text-lg font-bold">Category Breakdown Chart</h3>
                   <p className="text-xs opacity-60">Expense distribution share</p>
                 </div>
-                <Activity size={20} className="text-emerald-500" />
+                <Activity size={20} className="text-income" />
               </div>
-              <div className="h-72 w-full flex items-center justify-center">
-                {pieChartData.length === 0 ? (
+              <div className="h-64 md:h-72 w-full flex items-center justify-center">
+                {pieChartData.length === 0? (
                   <p className="text-xs opacity-60">No expense category data available.</p>
                 ) : (
                   <ResponsiveContainer width="100%" height="100%">
@@ -548,10 +550,10 @@ function Dashboard() {
                         data={pieChartData}
                         cx="50%"
                         cy="50%"
-                        outerRadius={80}
+                        outerRadius={70}
                         dataKey="value"
                         label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                        fontSize={11}
+                        fontSize={10}
                       >
                         {pieChartData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -568,33 +570,33 @@ function Dashboard() {
 
       case "transactions":
         return (
-          <div key="transactions" className="p-6 rounded-2xl shadow-sm border bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-slate-800 dark:text-slate-100">
+          <div key="transactions" className="p-4 md:p-6 rounded-card shadow-card border bg-card border-border">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-lg font-bold">Recent Transactions</h3>
                 <p className="text-xs opacity-60">Your latest financial activity</p>
               </div>
-              <Link to="/transactions" className="text-xs font-bold flex items-center gap-1 text-blue-600 dark:text-blue-400">
+              <Link to="/transactions" className="text-xs font-bold flex items-center gap-1 text-primary">
                 View All <ArrowRight size={14} />
               </Link>
             </div>
             <div className="space-y-4">
-              {recentTransactions.length === 0 ? (
+              {recentTransactions.length === 0? (
                 <p className="text-sm opacity-60 text-center py-6">No recent transactions found.</p>
               ) : (
                 recentTransactions.map((tx) => (
-                  <div key={tx.id} className="flex items-center justify-between p-3 rounded-xl border border-transparent hover:opacity-100 transition-all">
+                  <div key={tx.id} className="flex items-center justify-between p-3 rounded-xl">
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold ${tx.type === "Income" ? "bg-emerald-500/10 text-emerald-500" : "bg-rose-500/10 text-rose-500"}`}>
-                        {tx.type === "Income" ? <ArrowUpRight size={18} /> : <ArrowDownLeft size={18} />}
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold ${tx.type === "Income"? "bg-income/10 text-income" : "bg-expense/10 text-expense"}`}>
+                        {tx.type === "Income"? <ArrowUpRight size={18} /> : <ArrowDownLeft size={18} />}
                       </div>
                       <div>
                         <h4 className="text-sm font-bold">{tx.title || tx.source || "Transaction"}</h4>
                         <p className="text-xs opacity-60">{tx.category || "General"} • {tx.date}</p>
                       </div>
                     </div>
-                    <span className={`text-sm font-bold ${tx.type === "Income" ? "text-emerald-500" : "text-rose-500"}`}>
-                      {tx.type === "Income" ? "+" : "-"}{currencySymbol}{Number(tx.amount || 0).toLocaleString()}
+                    <span className={`text-sm font-bold ${tx.type === "Income"? "text-income" : "text-expense"}`}>
+                      {tx.type === "Income"? "+" : "-"}{currencySymbol}{Number(tx.amount || 0).toLocaleString()}
                     </span>
                   </div>
                 ))
@@ -605,25 +607,25 @@ function Dashboard() {
 
       case "upcoming_bills":
         return (
-          <div key="upcoming_bills" className="p-6 rounded-2xl shadow-sm border bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-slate-800 dark:text-slate-100">
+          <div key="upcoming_bills" className="p-4 md:p-6 rounded-card shadow-card border bg-card border-border">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-lg font-bold">Upcoming Bills</h3>
                 <p className="text-xs opacity-60">Due in the next 7 days</p>
               </div>
-              <Link to="/recurring" className="text-xs font-bold text-blue-600 dark:text-blue-400">View All</Link>
+              <Link to="/recurring" className="text-xs font-bold text-primary">View All</Link>
             </div>
             <div className="space-y-3">
-              {upcomingBills.length === 0 ? (
+              {upcomingBills.length === 0? (
                 <div className="text-center py-6 opacity-60 text-xs">
-                  <CheckCircle2 size={24} className="mx-auto text-emerald-500 mb-1" />
+                  <CheckCircle2 size={24} className="mx-auto text-income mb-1" />
                   No upcoming bills due soon.
                 </div>
               ) : (
                 upcomingBills.map((bill) => (
-                  <div key={bill.id} className="p-3 bg-amber-500/15 border border-amber-500/20 rounded-xl flex items-center justify-between">
+                  <div key={bill.id} className="p-3 bg-budget/15 border-budget/20 rounded-xl flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-amber-500/20 text-amber-500 flex items-center justify-center shrink-0">
+                      <div className="w-9 h-9 rounded-lg bg-budget/20 text-budget flex items-center justify-center shrink-0">
                         <CalendarClock size={18} />
                       </div>
                       <div>
@@ -631,7 +633,7 @@ function Dashboard() {
                         <p className="text-[10px] opacity-60">Due: {bill.nextRunDate}</p>
                       </div>
                     </div>
-                    <span className="text-xs font-bold text-rose-500">-{currencySymbol}{Number(bill.amount).toLocaleString()}</span>
+                    <span className="text-xs font-bold text-expense">-{currencySymbol}{Number(bill.amount).toLocaleString()}</span>
                   </div>
                 ))
               )}
@@ -641,7 +643,7 @@ function Dashboard() {
 
       case "timeline":
         return (
-          <div key="timeline" className="p-6 rounded-2xl shadow-sm border bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-slate-800 dark:text-slate-100">
+          <div key="timeline" className="p-4 md:p-6 rounded-card shadow-card border bg-card border-border">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-lg font-bold">Recent Activity Timeline</h3>
@@ -650,13 +652,13 @@ function Dashboard() {
               <span className="text-xs opacity-60 font-semibold">{activityLogs.length} Events</span>
             </div>
 
-            {activityLogs.length === 0 ? (
+            {activityLogs.length === 0? (
               <p className="text-xs opacity-60 text-center py-6">No recent activity recorded yet.</p>
             ) : (
-              <div className="relative border-l border-gray-200 dark:border-slate-700 ml-3 space-y-6 py-2">
+              <div className="relative border-l border-border ml-3 space-y-6 py-2">
                 {activityLogs.slice(0, 10).map((item) => (
                   <div key={item.id} className="relative pl-6 group">
-                    <div className="absolute -left-3.5 top-0.5 flex h-7 w-7 items-center justify-center rounded-full bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 shadow-xs transition group-hover:scale-110">
+                    <div className="absolute -left-3.5 top-0.5 flex h-7 w-7 items-center justify-center rounded-full bg-background border-border shadow-xs transition group-hover:scale-110">
                       {getActivityIcon(item.type, item.action)}
                     </div>
 
@@ -682,39 +684,37 @@ function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen p-4 md:p-8 transition-colors duration-300 relative bg-gray-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100">
-      <div className="max-w-7xl mx-auto space-y-8">
-        
+    <div className="min-h-screen p-4 md:p-8 transition-colors duration-300 relative bg-background text-secondary">
+      <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
+
         {/* --- DASHBOARD CUSTOMIZER & UNDO/REDO HEADER BAR --- */}
-        <div className="p-4 rounded-2xl shadow-sm border bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 flex flex-wrap items-center justify-between gap-4">
+        <div className="p-4 rounded-card shadow-card border bg-card border-border flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-6 flex-wrap">
             <h2 className="text-base font-bold">Dashboard Overview</h2>
           </div>
 
           <div className="flex items-center gap-3 flex-wrap">
-            {/* Customize Dashboard Button */}
             <button
               onClick={() => setIsCustomizerOpen(true)}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 shadow-sm hover:opacity-90 transition-all text-slate-800 dark:text-slate-100"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-background border border-border shadow-sm hover:opacity-90 transition-all"
             >
-              <Settings size={14} className="text-blue-600 dark:text-blue-400" /> Customize Layout
+              <Settings size={14} className="text-primary" /> Customize Layout
             </button>
 
-            {/* Undo / Redo Action Buttons */}
             <div className="flex items-center gap-2">
-              <button 
+              <button
                 onClick={undo}
                 disabled={!canUndo}
                 title="Undo Action"
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-investment text-white shadow hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
               >
                 <RotateCcw size={14} /> Undo
               </button>
-              <button 
+              <button
                 onClick={redo}
                 disabled={!canRedo}
                 title="Redo Action"
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-investment text-white shadow hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
               >
                 Redo <RotateCw size={14} />
               </button>
@@ -723,7 +723,7 @@ function Dashboard() {
         </div>
 
         {/* --- DYNAMIC RENDERED SECTIONS BASED ON CONFIG --- */}
-        <div className="space-y-8">
+        <div className="space-y-6 md:space-y-8">
           {cardsConfig.map((card) => {
             if (!card.visible) return null;
             return renderDashboardSection(card.id);
@@ -733,13 +733,12 @@ function Dashboard() {
       </div>
 
       {/* --- FLOATING QUICK ACTIONS (FAB) --- */}
-      <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3">
-        {/* Expanded Quick Action Items (Opens Forms Directly) */}
+      <div className="fixed bottom-6 right-6 z-40 flex-col items-end gap-3">
         {isFabOpen && (
           <div className="flex flex-col items-end gap-2.5 animate-in fade-in slide-in-from-bottom-3 duration-200">
             <button
               onClick={() => { setActiveModalType("Income"); setIsFabOpen(false); }}
-              className="flex items-center gap-2.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl shadow-lg text-xs font-bold transition-all transform hover:scale-105"
+              className="flex items-center gap-2.5 px-4 py-2.5 bg-income hover:opacity-90 text-white rounded-2xl shadow-lg text-xs font-bold transition-all transform hover:scale-105"
             >
               <span>Add Income</span>
               <div className="w-7 h-7 rounded-xl bg-white/20 flex items-center justify-center">
@@ -749,7 +748,7 @@ function Dashboard() {
 
             <button
               onClick={() => { setActiveModalType("Expense"); setIsFabOpen(false); }}
-              className="flex items-center gap-2.5 px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-2xl shadow-lg text-xs font-bold transition-all transform hover:scale-105"
+              className="flex items-center gap-2.5 px-4 py-2.5 bg-expense hover:opacity-90 text-white rounded-2xl shadow-lg text-xs font-bold transition-all transform hover:scale-105"
             >
               <span>Add Expense</span>
               <div className="w-7 h-7 rounded-xl bg-white/20 flex items-center justify-center">
@@ -759,7 +758,7 @@ function Dashboard() {
 
             <button
               onClick={() => { setActiveModalType("Budget"); setIsFabOpen(false); }}
-              className="flex items-center gap-2.5 px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-2xl shadow-lg text-xs font-bold transition-all transform hover:scale-105"
+              className="flex items-center gap-2.5 px-4 py-2.5 bg-budget hover:opacity-90 text-white rounded-2xl shadow-lg text-xs font-bold transition-all transform hover:scale-105"
             >
               <span>Create Budget</span>
               <div className="w-7 h-7 rounded-xl bg-white/20 flex items-center justify-center">
@@ -769,7 +768,7 @@ function Dashboard() {
 
             <button
               onClick={() => { setActiveModalType("Goal"); setIsFabOpen(false); }}
-              className="flex items-center gap-2.5 px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl shadow-lg text-xs font-bold transition-all transform hover:scale-105"
+              className="flex items-center gap-2.5 px-4 py-2.5 bg-investment hover:opacity-90 text-white rounded-2xl shadow-lg text-xs font-bold transition-all transform hover:scale-105"
             >
               <span>Add Goal</span>
               <div className="w-7 h-7 rounded-xl bg-white/20 flex items-center justify-center">
@@ -779,11 +778,10 @@ function Dashboard() {
           </div>
         )}
 
-        {/* Main Floating Trigger Button */}
         <button
           onClick={() => setIsFabOpen(!isFabOpen)}
-          className={`w-14 h-14 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white shadow-xl flex items-center justify-center transition-all transform hover:scale-105 active:scale-95 ${
-            isFabOpen ? "rotate-45 bg-slate-700 hover:bg-slate-800" : ""
+          className={`w-14 h-14 rounded-2xl bg-primary hover:opacity-90 text-white shadow-xl flex items-center justify-center transition-all transform hover:scale-105 active:scale-95 ${
+            isFabOpen? "rotate-45" : ""
           }`}
           title="Quick Actions"
         >
