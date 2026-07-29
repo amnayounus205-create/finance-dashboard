@@ -22,7 +22,7 @@ import {
 import { useAuth } from "../../context/AuthContext";
 import { useFinance } from "../../context/FinanceContext";
 
-function Sidebar() {
+function Sidebar({ onCloseMobile }) {
   const { logout } = useAuth();
   const { currentTheme } = useFinance();
   const navRef = useRef(null);
@@ -100,7 +100,7 @@ function Sidebar() {
   const sidebarStyle = getSidebarStyle();
 
   return (
-    <aside className={`w-64 h-screen sticky top-0 border-r flex flex-col transition-colors duration-300 ${sidebarStyle.aside}`}>
+    <aside className={`w-64 h-full flex flex-col transition-colors duration-300 ${sidebarStyle.aside}`}>
       <div className={`p-6 text-2xl font-bold border-b ${sidebarStyle.border} shrink-0`}>
         💰 Finance
       </div>
@@ -109,7 +109,7 @@ function Sidebar() {
       <div className="px-4 pt-2 shrink-0">
         <button
           onClick={scrollUp}
-          className={`w-full flex items-center justify-center py-1 rounded-lg border text-xs transition shadow-xs ${sidebarStyle.scrollBtn}`}
+          className={`w-full flex items-center justify-center py-1 rounded-lg border text-xs transition shadow-xs cursor-pointer ${sidebarStyle.scrollBtn}`}
           title="Scroll Up"
         >
           <ChevronUp size={16} />
@@ -125,6 +125,7 @@ function Sidebar() {
             <NavLink
               key={item.name}
               to={item.path}
+              onClick={onCloseMobile}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all ${
                   isActive
@@ -144,7 +145,7 @@ function Sidebar() {
       <div className="px-4 pb-2 shrink-0">
         <button
           onClick={scrollDown}
-          className={`w-full flex items-center justify-center py-1 rounded-lg border text-xs transition shadow-xs ${sidebarStyle.scrollBtn}`}
+          className={`w-full flex items-center justify-center py-1 rounded-lg border text-xs transition shadow-xs cursor-pointer ${sidebarStyle.scrollBtn}`}
           title="Scroll Down"
         >
           <ChevronDown size={16} />
@@ -153,7 +154,7 @@ function Sidebar() {
 
       <button
         onClick={logout}
-        className="m-4 shrink-0 flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white text-xs font-bold rounded-xl py-3 transition shadow-sm"
+        className="m-4 shrink-0 flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white text-xs font-bold rounded-xl py-3 transition shadow-sm cursor-pointer"
       >
         <LogOut size={16} />
         Logout
