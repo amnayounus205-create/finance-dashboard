@@ -1,9 +1,73 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, memo } from "react";
 import { Pencil, Trash2, ArrowUpDown, Receipt } from "lucide-react";
 import toast from "react-hot-toast";
 
 import { useFinance } from "../../context/FinanceContext";
 import ConfirmModal from "../common/ConfirmModal";
+
+// 🚀 Memoized Table Row to prevent unnecessary re-renders
+const IncomeRow = memo(({ income, onEdit, onDeleteClick }) => {
+  return (
+    <tr className="transition hover:bg-gray-50/80">
+      {/* Source & Notes */}
+      <td className="px-5 py-4">
+        <div className="font-semibold text-gray-900">{income.source}</div>
+        {income.notes && (
+          <div className="mt-0.5 text-xs text-gray-400 truncate max-w-xs">
+            {income.notes}
+          </div>
+        )}
+      </td>
+
+      {/* Category Badge */}
+      <td className="px-5 py-4">
+        <span className="inline-flex items-center rounded-md bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+          {income.category}
+        </span>
+      </td>
+
+      {/* Amount */}
+      <td className="px-5 py-4 text-right font-semibold text-emerald-600">
+        +${Number(income.amount).toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        })}
+      </td>
+
+      {/* Date */}
+      <td className="px-5 py-4 whitespace-nowrap text-gray-500">
+        {new Date(income.date).toLocaleDateString("en-US", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        })}
+      </td>
+
+      {/* Action Controls */}
+      <td className="px-5 py-4">
+        <div className="flex items-center justify-center gap-2">
+          <button
+            onClick={() => onEdit(income)}
+            title="Edit Income"
+            className="rounded-lg p-1.5 text-gray-500 transition hover:bg-amber-50 hover:text-amber-600"
+          >
+            <Pencil size={16} />
+          </button>
+
+          <button
+            onClick={() => onDeleteClick(income.id)}
+            title="Delete Income"
+            className="rounded-lg p-1.5 text-gray-500 transition hover:bg-red-50 hover:text-red-600"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
+      </td>
+    </tr>
+  );
+});
+
+IncomeRow.displayName = "IncomeRow";
 
 const IncomeTable = ({ incomes, onEdit }) => {
   const { deleteIncome } = useFinance();
@@ -100,67 +164,12 @@ const IncomeTable = ({ incomes, onEdit }) => {
 
           <tbody className="divide-y divide-gray-100 bg-white">
             {sortedIncomes.map((income) => (
-              <tr
+              <IncomeRow
                 key={income.id}
-                className="transition hover:bg-gray-50/80"
-              >
-                {/* Source & Notes */}
-                <td className="px-5 py-4">
-                  <div className="font-semibold text-gray-900">
-                    {income.source}
-                  </div>
-                  {income.notes && (
-                    <div className="mt-0.5 text-xs text-gray-400 truncate max-w-xs">
-                      {income.notes}
-                    </div>
-                  )}
-                </td>
-
-                {/* Category Badge */}
-                <td className="px-5 py-4">
-                  <span className="inline-flex items-center rounded-md bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
-                    {income.category}
-                  </span>
-                </td>
-
-                {/* Amount */}
-                <td className="px-5 py-4 text-right font-semibold text-emerald-600">
-                  +${Number(income.amount).toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </td>
-
-                {/* Date */}
-                <td className="px-5 py-4 whitespace-nowrap text-gray-500">
-                  {new Date(income.date).toLocaleDateString("en-US", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  })}
-                </td>
-
-                {/* Action Controls */}
-                <td className="px-5 py-4">
-                  <div className="flex items-center justify-center gap-2">
-                    <button
-                      onClick={() => onEdit(income)}
-                      title="Edit Income"
-                      className="rounded-lg p-1.5 text-gray-500 transition hover:bg-amber-50 hover:text-amber-600"
-                    >
-                      <Pencil size={16} />
-                    </button>
-
-                    <button
-                      onClick={() => handleDeleteClick(income.id)}
-                      title="Delete Income"
-                      className="rounded-lg p-1.5 text-gray-500 transition hover:bg-red-50 hover:text-red-600"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
+                income={income}
+                onEdit={onEdit}
+                onDeleteClick={handleDeleteClick}
+              />
             ))}
           </tbody>
         </table>

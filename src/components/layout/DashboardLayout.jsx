@@ -5,7 +5,7 @@ import Navbar from "./Navbar";
 import { useFinance } from "../../context/FinanceContext";
 import { Menu } from "lucide-react";
 
-// Theme styles configuration mapping
+
 const themeStyles = {
   light: {
     bg: "bg-slate-100",
@@ -33,7 +33,7 @@ function DashboardLayout() {
   return (
     <div className={`flex h-screen ${activeTheme.bg} ${activeTheme.text} transition-colors duration-300 overflow-hidden`}>
       
-      {/* Mobile Backdrop Overlay (Jab mobile menu khulega toh background dark/blur ho jayega) */}
+      
       {isMobileMenuOpen && (
         <div 
           onClick={() => setIsMobileMenuOpen(false)}
@@ -41,7 +41,7 @@ function DashboardLayout() {
         />
       )}
 
-      {/* Sidebar (Mobile par hidden/slide-out drawer, Desktop par normal fixed/relative) */}
+     
       <div className={`
         fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out
         md:relative md:translate-x-0 shrink-0 h-full
@@ -50,10 +50,10 @@ function DashboardLayout() {
         <Sidebar onCloseMobile={() => setIsMobileMenuOpen(false)} />
       </div>
 
-      {/* Main Content Area (Navbar + Outlet) */}
+     
       <div className={`flex-1 flex flex-col min-w-0 h-full overflow-hidden theme-${currentTheme}`}>
         
-        {/* Top bar with Mobile Hamburger Trigger Button */}
+       
         <div className="flex items-center shrink-0 border-b border-inherit/10">
           <button
             onClick={() => setIsMobileMenuOpen(true)}
@@ -68,7 +68,7 @@ function DashboardLayout() {
           </div>
         </div>
 
-        {/* Scrollable Main Content */}
+        
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
           <Outlet />
         </main>

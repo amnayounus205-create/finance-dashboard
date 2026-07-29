@@ -11,7 +11,7 @@ function Navbar() {
   const [isThemeDropdownOpen, setIsThemeDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Close dropdown on outside click
+ 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -22,7 +22,7 @@ function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Theme-based styling mapping for Navbar components (Har theme ke liye alag styling)
+
   const getNavbarStyle = () => {
     switch (currentTheme) {
       case "dark":
@@ -98,7 +98,7 @@ function Navbar() {
 
         <div className="flex items-center gap-3 sm:gap-4">
           
-          {/* --- QUICK THEME SELECTOR DROPDOWN SHORTCUT --- */}
+         
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsThemeDropdownOpen(!isThemeDropdownOpen)}
@@ -136,7 +136,7 @@ function Navbar() {
             )}
           </div>
 
-          {/* Global Search Trigger Button */}
+         
           <button
             onClick={() => setIsSearchOpen(true)}
             className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all border text-sm cursor-pointer ${themeStyle.searchBtn}`}
@@ -149,7 +149,7 @@ function Navbar() {
             </kbd>
           </button>
 
-          {/* Notification Bell with Live Counter */}
+          
           <button
             onClick={() => navigate("/notifications")}
             className={`relative w-10 h-10 rounded-full flex items-center justify-center transition-all border cursor-pointer ${themeStyle.bellBtn}`}
@@ -163,7 +163,7 @@ function Navbar() {
             )}
           </button>
 
-          {/* User Info Section */}
+       
           <div className={`flex items-center gap-3 border-l pl-4 ${themeStyle.divider}`}>
             <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold shadow-sm">
               {userProfile?.name?.charAt(0) || "U"}
@@ -182,7 +182,6 @@ function Navbar() {
         </div>
       </header>
 
-      {/* Global Search Modal Render */}
       {isSearchOpen && <GlobalSearch onClose={() => setIsSearchOpen(false)} />}
     </>
   );

@@ -373,6 +373,59 @@ export const FinanceProvider = ({ children }) => {
     logActivity("Deleted Budget", "Removed a budget category limit.", "budget");
   };
 
+  // --- COMPLETE DATA BACKUP, EXPORT & IMPORT HANDLERS ---
+  const exportToJson = () => {
+    const fullAppData = {
+      ...state,
+      recurringBills,
+      activityLogs,
+    };
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(fullAppData, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `finance_complete_backup_${new Date().toISOString().slice(0, 10)}.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+    logActivity("Export JSON", "Downloaded complete website finance data backup.", "system");
+  };
+
+  const exportToCsv = () => {
+    let csvContent = "data:text/csv;charset=utf-8,ID,Type,Category,Amount,Date,Description\n";
+
+    (state.incomes || []).forEach(inc => {
+      csvContent += `"${inc.id || ''}","Income","${inc.category || ''}","${inc.amount || 0}","${inc.date || ''}","${inc.description || ''}"\n`;
+    });
+
+    (state.expenses || []).forEach(exp => {
+      csvContent += `"${exp.id || ''}","Expense","${exp.category || ''}","${exp.amount || 0}","${exp.date || ''}","${exp.description || ''}"\n`;
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `transactions_report_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    logActivity("Export CSV", "Downloaded transactions report spreadsheet.", "system");
+  };
+
+  const importData = (importedData) => {
+    if (!importedData || typeof importedData !== "object") {
+      alert("Invalid backup file format!");
+      return;
+    }
+
+    if (importedData.userProfile) updateProfile(importedData.userProfile);
+    if (importedData.recurringBills) setRecurringBills(importedData.recurringBills);
+    if (importedData.activityLogs) setActivityLogs(importedData.activityLogs);
+
+    dispatchWithHistory({ type: "SET_FULL_STATE", payload: importedData });
+    logActivity("Import JSON", "Restored complete finance data from backup file.", "system");
+    alert("Data successfully imported and synchronized across the website!");
+  };
+
   // Calculations
   const totalIncome = useMemo(() => calculateTotal(state.incomes), [state.incomes]);
   const totalExpense = useMemo(() => calculateTotal(state.expenses), [state.expenses]);
@@ -427,6 +480,9 @@ export const FinanceProvider = ({ children }) => {
         isOnline,
         isSyncing,
         pendingSyncCount,
+        exportToJson,
+        exportToCsv,
+        importData,
         undo,
         redo,
         canUndo,

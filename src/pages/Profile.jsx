@@ -1,9 +1,20 @@
-import { useState, useEffect } from "react";
-import { User, Globe, Bell, Palette, Calendar, Clock, Save } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { User, Globe, Bell, Palette, Calendar, Clock, Save, Download, Upload, FileText, FileSpreadsheet } from "lucide-react";
 import { useFinance } from "../context/FinanceContext";
 
 const Settings = () => {
-  const { userProfile, updateProfile, currentTheme, setCurrentTheme, setCurrency: handleGlobalCurrency } = useFinance?.() || {};
+  const { 
+    userProfile, 
+    updateProfile, 
+    currentTheme, 
+    setCurrentTheme, 
+    setCurrency: handleGlobalCurrency,
+    exportToJson,
+    exportToCsv,
+    importData 
+  } = useFinance?.() || {};
+
+  const fileInputRef = useRef(null);
 
   const [name, setName] = useState(userProfile?.name || "John Doe");
   const [email, setEmail] = useState(userProfile?.email || "john.doe@example.com");
@@ -49,6 +60,23 @@ const Settings = () => {
     }
     setSavedMessage(true);
     setTimeout(() => setSavedMessage(false), 3000);
+  };
+
+  const handleFileChange = (e) => {
+    const fileReader = new FileReader();
+    if (e.target.files && e.target.files[0]) {
+      fileReader.readAsText(e.target.files[0], "UTF-8");
+      fileReader.onload = (event) => {
+        try {
+          const parsedData = JSON.parse(event.target.result);
+          if (importData) {
+            importData(parsedData);
+          }
+        } catch (error) {
+          alert("Invalid JSON backup file!");
+        }
+      };
+    }
   };
 
   return (
@@ -266,6 +294,74 @@ const Settings = () => {
               />
               <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
             </label>
+          </div>
+        </div>
+
+        {/* --- DATA IMPORT / EXPORT SECTION --- */}
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-6 space-y-6">
+          <div className="flex items-center gap-3 border-b border-gray-100 dark:border-slate-700 pb-4">
+            <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+              <Download size={20} />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold">Data Import / Export</h3>
+              <p className="text-xs text-gray-400">Backup your complete website data or export transaction spreadsheets</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {/* Export JSON */}
+            <button
+              type="button"
+              onClick={exportToJson}
+              className="flex items-center gap-3 p-4 rounded-2xl bg-gray-50 dark:bg-slate-700/50 hover:bg-gray-100 dark:hover:bg-slate-700 border border-gray-200 dark:border-slate-600 transition text-left cursor-pointer"
+            >
+              <div className="p-3 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 rounded-xl">
+                <FileText size={20} />
+              </div>
+              <div>
+                <span className="font-bold text-gray-800 dark:text-white block text-sm">Export JSON</span>
+                <span className="text-[11px] text-gray-500 dark:text-gray-400">Complete website backup</span>
+              </div>
+            </button>
+
+            {/* Export CSV */}
+            <button
+              type="button"
+              onClick={exportToCsv}
+              className="flex items-center gap-3 p-4 rounded-2xl bg-gray-50 dark:bg-slate-700/50 hover:bg-gray-100 dark:hover:bg-slate-700 border border-gray-200 dark:border-slate-600 transition text-left cursor-pointer"
+            >
+              <div className="p-3 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 rounded-xl">
+                <FileSpreadsheet size={20} />
+              </div>
+              <div>
+                <span className="font-bold text-gray-800 dark:text-white block text-sm">Export CSV</span>
+                <span className="text-[11px] text-gray-500 dark:text-gray-400">Download reports</span>
+              </div>
+            </button>
+
+            {/* Import JSON */}
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex items-center gap-3 p-4 rounded-2xl bg-gray-50 dark:bg-slate-700/50 hover:bg-gray-100 dark:hover:bg-slate-700 border border-gray-200 dark:border-slate-600 transition text-left cursor-pointer"
+            >
+              <div className="p-3 bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 rounded-xl">
+                <Upload size={20} />
+              </div>
+              <div>
+                <span className="font-bold text-gray-800 dark:text-white block text-sm">Import JSON</span>
+                <span className="text-[11px] text-gray-500 dark:text-gray-400">Restore website data</span>
+              </div>
+            </button>
+
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept=".json"
+              className="hidden"
+            />
           </div>
         </div>
 

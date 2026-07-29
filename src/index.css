@@ -25,11 +25,7 @@ button {
   @apply transition-all duration-300;
 }
 
-/* ==========================================
-   STABLE & CLEAN THEME ENGINE
-   ========================================== */
 
-/* --- DARK THEME --- */
 .theme-dark .bg-white, 
 .theme-dark [class*="bg-white"],
 .theme-dark [class*="bg-slate-50"],
@@ -37,12 +33,11 @@ button {
 .theme-dark .card,
 .theme-dark table,
 .theme-dark div[class*="rounded"] {
-  background-color: #1e293b !important; /* slate-800 */
+  background-color: #1e293b !important; 
   color: #f1f5f9 !important;
   border-color: #334155 !important;
 }
 
-/* --- BLUE THEME --- */
 .theme-blue {
   color: #eff6ff !important;
 }
@@ -53,12 +48,12 @@ button {
 .theme-blue .card,
 .theme-blue table,
 .theme-blue div[class*="rounded"] {
-  background-color: #1e3a8a !important; /* blue-900 */
+  background-color: #1e3a8a !important;
   color: #eff6ff !important;
   border-color: #1d4ed8 !important;
 }
 
-/* --- GREEN THEME --- */
+
 .theme-green {
   color: #ecfdf5 !important;
 }
@@ -69,14 +64,11 @@ button {
 .theme-green .card,
 .theme-green table,
 .theme-green div[class*="rounded"] {
-  background-color: #064e3b !important; /* emerald-900 */
+  background-color: #064e3b !important; 
   color: #ecfdf5 !important;
   border-color: #047857 !important;
 }
 
-/* ==========================================
-   FORCE ALL HEADINGS & CALENDAR ELEMENTS WHITE
-   ========================================== */
 .theme-dark h1, .theme-dark h2, .theme-dark h3, .theme-dark h4, .theme-dark h5, .theme-dark h6,
 .theme-blue h1, .theme-blue h2, .theme-blue h3, .theme-blue h4, .theme-blue h5, .theme-blue h6,
 .theme-green h1, .theme-green h2, .theme-green h3, .theme-green h4, .theme-green h5, .theme-green h6,
