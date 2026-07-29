@@ -75,10 +75,13 @@ button {
 }
 
 /* ==========================================
-   FORCE ALL HEADINGS WHITE ACROSS ALL THEMES
+   FORCE ALL HEADINGS & CALENDAR ELEMENTS WHITE
    ========================================== */
 .theme-dark h1, .theme-dark h2, .theme-dark h3, .theme-dark h4, .theme-dark h5, .theme-dark h6,
 .theme-blue h1, .theme-blue h2, .theme-blue h3, .theme-blue h4, .theme-blue h5, .theme-blue h6,
-.theme-green h1, .theme-green h2, .theme-green h3, .theme-green h4, .theme-green h5, .theme-green h6 {
+.theme-green h1, .theme-green h2, .theme-green h3, .theme-green h4, .theme-green h5, .theme-green h6,
+.theme-dark .calendar-container *, .theme-dark [class*="calendar"] *, .theme-dark [class*="fc"] *,
+.theme-blue .calendar-container *, .theme-blue [class*="calendar"] *, .theme-blue [class*="fc"] *,
+.theme-green .calendar-container *, .theme-green [class*="calendar"] *, .theme-green [class*="fc"] * {
   color: #ffffff !important;
 }

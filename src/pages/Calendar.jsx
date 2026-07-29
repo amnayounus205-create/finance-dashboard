@@ -136,27 +136,27 @@ const CalendarModule = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-secondary">Financial Calendar</h1>
-          <p className="text-gray-500 mt-1">Track daily income, expenses, and upcoming bill due dates.</p>
+          <h1 className="text-3xl font-bold text-slate-800 dark:text-white">Financial Calendar</h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">Track daily income, expenses, and upcoming bill due dates.</p>
         </div>
 
-        <div className="flex items-center gap-3 bg-white p-2 rounded-2xl shadow-sm border border-gray-100">
-          <button onClick={prevMonth} className="p-2 hover:bg-gray-100 rounded-xl transition text-gray-600">
+        <div className="flex items-center gap-3 bg-white dark:bg-slate-800 p-2 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
+          <button onClick={prevMonth} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition text-slate-600 dark:text-slate-300">
             <ChevronLeft size={20} />
           </button>
-          <span className="font-bold text-secondary text-base min-w-[140px] text-center">
+          <span className="font-bold text-slate-800 dark:text-white text-base min-w-[140px] text-center">
             {monthNames[month]} {year}
           </span>
-          <button onClick={nextMonth} className="p-2 hover:bg-gray-100 rounded-xl transition text-gray-600">
+          <button onClick={nextMonth} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition text-slate-600 dark:text-slate-300">
             <ChevronRight size={20} />
           </button>
         </div>
       </div>
 
       {/* Calendar Grid Container */}
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
         {/* Days of week header */}
-        <div className="grid grid-cols-7 bg-gray-50/70 border-b border-gray-100 text-center py-3 text-xs font-bold text-gray-400 uppercase tracking-wider">
+        <div className="grid grid-cols-7 bg-slate-100 dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 text-center py-3 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
           <span>Sun</span>
           <span>Mon</span>
           <span>Tue</span>
@@ -167,7 +167,7 @@ const CalendarModule = () => {
         </div>
 
         {/* Days Grid */}
-        <div className="grid grid-cols-7 auto-rows-fr bg-gray-100 gap-[1px]">
+        <div className="grid grid-cols-7 auto-rows-fr bg-slate-200 dark:bg-slate-700 gap-[1px]">
           {calendarDays.map((dayObj, index) => {
             const dayData = transactionsByDate[dayObj.dateStr] || { incomes: [], expenses: [] };
             const totalInc = dayData.incomes.reduce((acc, curr) => acc + Number(curr.amount || 0), 0);
@@ -179,20 +179,23 @@ const CalendarModule = () => {
               <div
                 key={index}
                 onClick={() => handleDayClick(dayObj.dateStr)}
-                className={`min-h-[110px] bg-white p-2.5 flex flex-col justify-between cursor-pointer transition hover:bg-blue-50/30 relative group ${
-                  !dayObj.isCurrentMonth ? "opacity-40 bg-gray-50/50" : ""
+                className={`min-h-[110px] bg-slate-50 dark:bg-slate-800 p-2.5 flex flex-col justify-between cursor-pointer transition hover:bg-slate-100 dark:hover:bg-slate-700/70 relative group ${
+                  !dayObj.isCurrentMonth ? "opacity-40 bg-slate-100/60 dark:bg-slate-900/50" : ""
                 } ${isToday ? "ring-2 ring-blue-500 ring-inset" : ""}`}
               >
                 <div className="flex items-center justify-between">
-                  <span className={`text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full ${
-                    isToday ? "bg-blue-600 text-white" : "text-gray-700"
+                  {/* HIGHLY PROMINENT DATE NUMBER BADGE */}
+                  <span className={`text-xs font-black px-2 py-1 rounded-lg shadow-sm border ${
+                    isToday 
+                      ? "bg-blue-600 text-white border-blue-500" 
+                      : "bg-white dark:bg-slate-700 text-slate-900 dark:text-white border-slate-200 dark:border-slate-600"
                   }`}>
                     {dayObj.dayNum}
                   </span>
 
                   {/* Bill Due Badge Highlight */}
                   {hasBillDue && (
-                    <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[9px] font-bold rounded-md flex items-center gap-1">
+                    <span className="px-1.5 py-0.5 bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 text-[9px] font-bold rounded-md flex items-center gap-1">
                       ⚠️ Bill Due
                     </span>
                   )}
@@ -201,13 +204,13 @@ const CalendarModule = () => {
                 {/* Day Summary Badges */}
                 <div className="space-y-1 mt-2">
                   {totalInc > 0 && (
-                    <div className="text-[10px] bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded-md font-semibold truncate flex items-center justify-between">
+                    <div className="text-[10px] bg-emerald-100/80 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 px-1.5 py-0.5 rounded-md font-bold truncate flex items-center justify-between">
                       <span>+{currencySymbol}{totalInc}</span>
                       <ArrowUpRight size={10} />
                     </div>
                   )}
                   {totalExp > 0 && (
-                    <div className="text-[10px] bg-rose-50 text-rose-700 px-1.5 py-0.5 rounded-md font-semibold truncate flex items-center justify-between">
+                    <div className="text-[10px] bg-rose-100/80 dark:bg-rose-950/70 text-rose-800 dark:text-rose-300 px-1.5 py-0.5 rounded-md font-bold truncate flex items-center justify-between">
                       <span>-{currencySymbol}{totalExp}</span>
                       <ArrowDownRight size={10} />
                     </div>
@@ -227,33 +230,33 @@ const CalendarModule = () => {
       {/* Selected Date Modal / Drawer */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-xl space-y-6 animate-in fade-in zoom-in duration-200">
-            <div className="flex items-center justify-between border-b pb-4">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl max-w-lg w-full p-6 shadow-xl space-y-6 animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center justify-between border-b dark:border-slate-700 pb-4">
               <div>
-                <h3 className="text-xl font-bold text-secondary">Date: {selectedDateStr}</h3>
-                <p className="text-xs text-gray-400 mt-0.5">View transactions or add new for this date.</p>
+                <h3 className="text-xl font-bold text-slate-800 dark:text-white">Date: {selectedDateStr}</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">View transactions or add new for this date.</p>
               </div>
-              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg font-bold">✕</button>
             </div>
 
             {/* Existing Transactions List for this date */}
             <div className="space-y-3 max-h-48 overflow-y-auto pr-1">
-              <h4 className="text-xs font-bold text-gray-400 uppercase">Existing Records</h4>
+              <h4 className="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase">Existing Records</h4>
               {selectedDayData.incomes.length === 0 && selectedDayData.expenses.length === 0 ? (
-                <p className="text-xs text-gray-400 italic">No transactions recorded on this date.</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500 italic">No transactions recorded on this date.</p>
               ) : (
                 <>
                   {selectedDayData.incomes.map(inc => (
-                    <div key={inc.id} className="flex justify-between items-center p-3 rounded-xl bg-emerald-50/50 border border-emerald-100 text-xs">
+                    <div key={inc.id} className="flex justify-between items-center p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/50 text-xs">
                       <div>
-                        <span className="font-semibold text-secondary block">{inc.category}</span>
-                        <span className="text-[10px] text-gray-400">{inc.description || 'Income'}</span>
+                        <span className="font-semibold text-slate-800 dark:text-white block">{inc.category}</span>
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400">{inc.description || 'Income'}</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="font-bold text-emerald-600">+{currencySymbol}{inc.amount}</span>
+                        <span className="font-bold text-emerald-600 dark:text-emerald-400">+{currencySymbol}{inc.amount}</span>
                         <button
                           onClick={() => setDeleteTarget({ id: inc.id, type: "Income" })}
-                          className="p-1.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-lg transition"
                           title="Delete Income"
                         >
                           <Trash2 size={14} />
@@ -262,16 +265,16 @@ const CalendarModule = () => {
                     </div>
                   ))}
                   {selectedDayData.expenses.map(exp => (
-                    <div key={exp.id} className="flex justify-between items-center p-3 rounded-xl bg-rose-50/50 border border-rose-100 text-xs">
+                    <div key={exp.id} className="flex justify-between items-center p-3 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 text-xs">
                       <div>
-                        <span className="font-semibold text-secondary block">{exp.category}</span>
-                        <span className="text-[10px] text-gray-400">{exp.description || 'Expense'}</span>
+                        <span className="font-semibold text-slate-800 dark:text-white block">{exp.category}</span>
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400">{exp.description || 'Expense'}</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="font-bold text-rose-600">-{currencySymbol}{exp.amount}</span>
+                        <span className="font-bold text-rose-600 dark:text-rose-400">-{currencySymbol}{exp.amount}</span>
                         <button
                           onClick={() => setDeleteTarget({ id: exp.id, type: "Expense" })}
-                          className="p-1.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded-lg transition"
                           title="Delete Expense"
                         >
                           <Trash2 size={14} />
@@ -284,15 +287,15 @@ const CalendarModule = () => {
             </div>
 
             {/* Add Transaction Form for this date */}
-            <form onSubmit={handleAddTransaction} className="space-y-4 pt-4 border-t">
-              <h4 className="text-xs font-bold text-secondary uppercase">Add Transaction on {selectedDateStr}</h4>
+            <form onSubmit={handleAddTransaction} className="space-y-4 pt-4 border-t dark:border-slate-700">
+              <h4 className="text-xs font-bold text-slate-800 dark:text-white uppercase">Add Transaction on {selectedDateStr}</h4>
               
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => setTxType("expense")}
                   className={`flex-1 py-2 rounded-xl text-xs font-semibold transition ${
-                    txType === "expense" ? "bg-rose-600 text-white shadow-sm" : "bg-gray-100 text-gray-500"
+                    txType === "expense" ? "bg-rose-600 text-white shadow-sm" : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300"
                   }`}
                 >
                   Expense
@@ -301,7 +304,7 @@ const CalendarModule = () => {
                   type="button"
                   onClick={() => setTxType("income")}
                   className={`flex-1 py-2 rounded-xl text-xs font-semibold transition ${
-                    txType === "income" ? "bg-emerald-600 text-white shadow-sm" : "bg-gray-100 text-gray-500"
+                    txType === "income" ? "bg-emerald-600 text-white shadow-sm" : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300"
                   }`}
                 >
                   Income
@@ -310,36 +313,36 @@ const CalendarModule = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[11px] font-semibold text-gray-500 block mb-1">Amount</label>
+                  <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">Amount</label>
                   <input
                     type="number"
                     placeholder="0.00"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                     required
-                    className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-transparent dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="text-[11px] font-semibold text-gray-500 block mb-1">Category</label>
+                  <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">Category</label>
                   <input
                     type="text"
                     placeholder="e.g., Food, Bills"
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-transparent dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-[11px] font-semibold text-gray-500 block mb-1">Description</label>
+                <label className="text-[11px] font-semibold text-slate-600 dark:text-slate-400 block mb-1">Description</label>
                 <input
                   type="text"
                   placeholder="Optional note..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 bg-transparent dark:text-white rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
 
@@ -347,7 +350,7 @@ const CalendarModule = () => {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition"
+                  className="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition"
                 >
                   Close
                 </button>
@@ -366,19 +369,19 @@ const CalendarModule = () => {
       {/* Delete Confirmation Modal */}
       {deleteTarget && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-xl space-y-4 text-center animate-in fade-in zoom-in duration-200">
-            <div className="w-12 h-12 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-2">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl max-w-sm w-full p-6 shadow-xl space-y-4 text-center animate-in fade-in zoom-in duration-200">
+            <div className="w-12 h-12 bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 rounded-full flex items-center justify-center mx-auto mb-2">
               <Trash2 size={24} />
             </div>
-            <h3 className="text-lg font-bold text-secondary">Delete Transaction?</h3>
-            <p className="text-xs text-gray-500">
+            <h3 className="text-lg font-bold text-slate-800 dark:text-white">Delete Transaction?</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Are you sure you want to delete this {deleteTarget.type.toLowerCase()}? This action cannot be undone.
             </p>
             <div className="flex gap-2 pt-2">
               <button
                 type="button"
                 onClick={() => setDeleteTarget(null)}
-                className="flex-1 py-2 text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition"
+                className="flex-1 py-2 text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl transition"
               >
                 Cancel
               </button>
