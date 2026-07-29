@@ -11,7 +11,6 @@ import {
   CheckCircle2,
   Calendar,
   Activity,
-  Palette,
   RotateCcw,
   RotateCw,
   Settings,
@@ -371,15 +370,6 @@ function Dashboard() {
 
   const currencySymbol = userProfile?.currency === "EUR" ? "€" : userProfile?.currency === "GBP" ? "£" : userProfile?.currency === "PKR" ? "₨" : userProfile?.currency === "INR" ? "₹" : "$";
 
-  // --- THEME CUSTOMIZATION STATE ---
-  const [currentTheme, setCurrentTheme] = useState(() => {
-    return localStorage.getItem("app_theme") || "light";
-  });
-
-  useEffect(() => {
-    localStorage.setItem("app_theme", currentTheme);
-  }, [currentTheme]);
-
   // --- DASHBOARD LAYOUT CONFIG STATE ---
   const [cardsConfig, setCardsConfig] = useState(() => {
     const saved = localStorage.getItem("dashboard_cards_config");
@@ -402,32 +392,6 @@ function Dashboard() {
       addGoal(data);
     }
   };
-
-  // Theme configuration styles map
-  const themeStyles = {
-    light: {
-      bg: "bg-gray-50 text-slate-800",
-      card: "bg-white border-gray-100 text-slate-800",
-      accent: "text-blue-600",
-    },
-    dark: {
-      bg: "bg-slate-900 text-slate-100",
-      card: "bg-slate-800 border-slate-700 text-slate-100",
-      accent: "text-blue-400",
-    },
-    blue: {
-      bg: "bg-blue-950 text-blue-50",
-      card: "bg-blue-900 border-blue-800 text-blue-50",
-      accent: "text-blue-300",
-    },
-    green: {
-      bg: "bg-emerald-950 text-emerald-50",
-      card: "bg-emerald-900 border-emerald-800 text-emerald-50",
-      accent: "text-emerald-300",
-    }
-  };
-
-  const activeTheme = themeStyles[currentTheme] || themeStyles.light;
 
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth();
@@ -501,7 +465,7 @@ function Dashboard() {
       case "overview":
         return (
           <div key="overview" className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className={`p-6 rounded-2xl shadow-sm border flex items-center justify-between ${activeTheme.card}`}>
+            <div className="p-6 rounded-2xl shadow-sm border bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-slate-800 dark:text-slate-100 flex items-center justify-between">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider opacity-60">Total Balance</p>
                 <h3 className="text-2xl font-bold mt-1">{currencySymbol}{totalBalance.toLocaleString()}</h3>
@@ -514,7 +478,7 @@ function Dashboard() {
               </div>
             </div>
 
-            <div className={`p-6 rounded-2xl shadow-sm border flex items-center justify-between ${activeTheme.card}`}>
+            <div className="p-6 rounded-2xl shadow-sm border bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-slate-800 dark:text-slate-100 flex items-center justify-between">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider opacity-60">Total Income</p>
                 <h3 className="text-2xl font-bold text-emerald-500 mt-1">{currencySymbol}{totalIncome.toLocaleString()}</h3>
@@ -527,7 +491,7 @@ function Dashboard() {
               </div>
             </div>
 
-            <div className={`p-6 rounded-2xl shadow-sm border flex items-center justify-between ${activeTheme.card}`}>
+            <div className="p-6 rounded-2xl shadow-sm border bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-slate-800 dark:text-slate-100 flex items-center justify-between">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider opacity-60">Total Expenses</p>
                 <h3 className="text-2xl font-bold text-rose-500 mt-1">{currencySymbol}{totalExpense.toLocaleString()}</h3>
@@ -545,13 +509,13 @@ function Dashboard() {
       case "charts":
         return (
           <div key="charts" className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className={`p-6 rounded-2xl shadow-sm border ${activeTheme.card}`}>
+            <div className="p-6 rounded-2xl shadow-sm border bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-slate-800 dark:text-slate-100">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h3 className="text-lg font-bold">Monthly Comparison Chart</h3>
                   <p className="text-xs opacity-60">Income vs Expenses Bar Comparison</p>
                 </div>
-                <Calendar size={20} className={activeTheme.accent} />
+                <Calendar size={20} className="text-blue-600 dark:text-blue-400" />
               </div>
               <div className="h-72 w-full">
                 <ResponsiveContainer width="100%" height="100%">
@@ -566,7 +530,7 @@ function Dashboard() {
               </div>
             </div>
 
-            <div className={`p-6 rounded-2xl shadow-sm border ${activeTheme.card}`}>
+            <div className="p-6 rounded-2xl shadow-sm border bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-slate-800 dark:text-slate-100">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h3 className="text-lg font-bold">Category Breakdown Chart</h3>
@@ -604,13 +568,13 @@ function Dashboard() {
 
       case "transactions":
         return (
-          <div key="transactions" className={`p-6 rounded-2xl shadow-sm border ${activeTheme.card}`}>
+          <div key="transactions" className="p-6 rounded-2xl shadow-sm border bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-slate-800 dark:text-slate-100">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-lg font-bold">Recent Transactions</h3>
                 <p className="text-xs opacity-60">Your latest financial activity</p>
               </div>
-              <Link to="/transactions" className={`text-xs font-bold flex items-center gap-1 ${activeTheme.accent}`}>
+              <Link to="/transactions" className="text-xs font-bold flex items-center gap-1 text-blue-600 dark:text-blue-400">
                 View All <ArrowRight size={14} />
               </Link>
             </div>
@@ -641,13 +605,13 @@ function Dashboard() {
 
       case "upcoming_bills":
         return (
-          <div key="upcoming_bills" className={`p-6 rounded-2xl shadow-sm border ${activeTheme.card}`}>
+          <div key="upcoming_bills" className="p-6 rounded-2xl shadow-sm border bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-slate-800 dark:text-slate-100">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-lg font-bold">Upcoming Bills</h3>
                 <p className="text-xs opacity-60">Due in the next 7 days</p>
               </div>
-              <Link to="/recurring" className={`text-xs font-bold ${activeTheme.accent}`}>View All</Link>
+              <Link to="/recurring" className="text-xs font-bold text-blue-600 dark:text-blue-400">View All</Link>
             </div>
             <div className="space-y-3">
               {upcomingBills.length === 0 ? (
@@ -677,7 +641,7 @@ function Dashboard() {
 
       case "timeline":
         return (
-          <div key="timeline" className={`p-6 rounded-2xl shadow-sm border ${activeTheme.card}`}>
+          <div key="timeline" className="p-6 rounded-2xl shadow-sm border bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 text-slate-800 dark:text-slate-100">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-lg font-bold">Recent Activity Timeline</h3>
@@ -718,52 +682,22 @@ function Dashboard() {
   };
 
   return (
-    <div className={`min-h-screen p-4 md:p-8 transition-colors duration-300 relative ${activeTheme.bg}`}>
+    <div className="min-h-screen p-4 md:p-8 transition-colors duration-300 relative bg-gray-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100">
       <div className="max-w-7xl mx-auto space-y-8">
         
-        {/* --- THEME CUSTOMIZER, DASHBOARD CUSTOMIZER & UNDO/REDO HEADER BAR --- */}
-        <div className={`p-4 rounded-2xl shadow-sm border flex flex-wrap items-center justify-between gap-4 ${activeTheme.card}`}>
+        {/* --- DASHBOARD CUSTOMIZER & UNDO/REDO HEADER BAR --- */}
+        <div className="p-4 rounded-2xl shadow-sm border bg-white dark:bg-slate-800 border-gray-100 dark:border-slate-700 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-6 flex-wrap">
-            {/* Theme Customization */}
-            <div className="flex items-center gap-2">
-              <Palette size={20} className={activeTheme.accent} />
-              <span className="text-sm font-bold">Theme:</span>
-              <div className="flex items-center gap-1.5 ml-2">
-                <button 
-                  onClick={() => setCurrentTheme("light")}
-                  className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all ${currentTheme === "light" ? "bg-blue-600 text-white shadow" : "bg-gray-100 text-slate-700 hover:bg-gray-200"}`}
-                >
-                  Light
-                </button>
-                <button 
-                  onClick={() => setCurrentTheme("dark")}
-                  className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all ${currentTheme === "dark" ? "bg-slate-700 text-white shadow" : "bg-slate-800 text-slate-300 hover:bg-slate-700"}`}
-                >
-                  Dark
-                </button>
-                <button 
-                  onClick={() => setCurrentTheme("blue")}
-                  className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all ${currentTheme === "blue" ? "bg-blue-700 text-white shadow" : "bg-blue-900 text-blue-200 hover:bg-blue-800"}`}
-                >
-                  Blue
-                </button>
-                <button 
-                  onClick={() => setCurrentTheme("green")}
-                  className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all ${currentTheme === "green" ? "bg-emerald-700 text-white shadow" : "bg-emerald-900 text-emerald-200 hover:bg-emerald-800"}`}
-                >
-                  Green
-                </button>
-              </div>
-            </div>
+            <h2 className="text-base font-bold">Dashboard Overview</h2>
           </div>
 
           <div className="flex items-center gap-3 flex-wrap">
             {/* Customize Dashboard Button */}
             <button
               onClick={() => setIsCustomizerOpen(true)}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 shadow-sm hover:opacity-90 transition-all"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 shadow-sm hover:opacity-90 transition-all text-slate-800 dark:text-slate-100"
             >
-              <Settings size={14} className={activeTheme.accent} /> Customize Layout
+              <Settings size={14} className="text-blue-600 dark:text-blue-400" /> Customize Layout
             </button>
 
             {/* Undo / Redo Action Buttons */}

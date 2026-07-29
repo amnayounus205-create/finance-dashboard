@@ -42,13 +42,26 @@ export const FinanceProvider = ({ children }) => {
 
   const [state, dispatch] = useReducer(financeReducer, storedData);
 
-  // --- THEME CUSTOMIZATION STATE (Globalized) ---
+  // --- THEME CUSTOMIZATION STATE (Globalized across all pages) ---
   const [currentTheme, setCurrentTheme] = useState(() => {
     return localStorage.getItem("app_theme") || "light";
   });
 
   useEffect(() => {
     localStorage.setItem("app_theme", currentTheme);
+    const root = document.documentElement;
+    
+    // Purani saari theme classes remove karein
+    root.classList.remove("dark", "theme-blue", "theme-green");
+    
+    // Active theme class root par lagayein
+    if (currentTheme === "dark") {
+      root.classList.add("dark");
+    } else if (currentTheme === "blue") {
+      root.classList.add("theme-blue");
+    } else if (currentTheme === "green") {
+      root.classList.add("theme-green");
+    }
   }, [currentTheme]);
 
   // --- MULTI-CURRENCY SUPPORT STATE ---
@@ -257,6 +270,16 @@ export const FinanceProvider = ({ children }) => {
     logActivity("Deleted Expense", "Removed an expense transaction record.", "expense");
   };
 
+  // --- UNIFIED TRANSACTION DELETE HELPER ---
+  const deleteTransaction = (id, type) => {
+    const isIncome = type === "Income" || (state.incomes || []).some(item => item.id === id);
+    if (isIncome || type === "Income") {
+      deleteIncome(id);
+    } else {
+      deleteExpense(id);
+    }
+  };
+
   // Recurring Bills CRUD
   const [recurringBills, setRecurringBills] = useLocalStorage("finance_recurring_bills", []);
 
@@ -435,6 +458,7 @@ export const FinanceProvider = ({ children }) => {
         addExpense,
         updateExpense,
         deleteExpense,
+        deleteTransaction,
         addBudget,
         updateBudget,
         deleteBudget,
@@ -454,7 +478,7 @@ export const FinanceProvider = ({ children }) => {
           </div>
         ) : !isOnline ? (
           <div className="flex items-center gap-2 px-4 py-2 bg-rose-600 text-white text-sm font-bold rounded-full shadow-lg animate-bounce">
-            <WifiOff size5={16} /> Offline (Local Changes: {pendingSyncCount})
+            <WifiOff size={16} /> Offline (Local Changes: {pendingSyncCount})
           </div>
         ) : pendingSyncCount > 0 && !isSyncing ? (
           <div className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-sm font-bold rounded-full shadow-lg">

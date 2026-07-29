@@ -24,3 +24,52 @@ body {
 button {
   @apply transition-all duration-300;
 }
+
+/* ==========================================
+   STABLE & CLEAN THEME ENGINE
+   ========================================== */
+
+/* --- DARK THEME --- */
+.theme-dark .bg-white, 
+.theme-dark [class*="bg-white"],
+.theme-dark [class*="bg-slate-50"],
+.theme-dark [class*="bg-gray-"],
+.theme-dark .card,
+.theme-dark table,
+.theme-dark div[class*="rounded"] {
+  background-color: #1e293b !important; /* slate-800 */
+  color: #f1f5f9 !important;
+  border-color: #334155 !important;
+}
+
+/* --- BLUE THEME --- */
+.theme-blue {
+  color: #eff6ff !important;
+}
+.theme-blue .bg-white, 
+.theme-blue [class*="bg-white"],
+.theme-blue [class*="bg-slate-50"],
+.theme-blue [class*="bg-gray-"],
+.theme-blue .card,
+.theme-blue table,
+.theme-blue div[class*="rounded"] {
+  background-color: #1e3a8a !important; /* blue-900 */
+  color: #eff6ff !important;
+  border-color: #1d4ed8 !important;
+}
+
+/* --- GREEN THEME --- */
+.theme-green {
+  color: #ecfdf5 !important;
+}
+.theme-green .bg-white, 
+.theme-green [class*="bg-white"],
+.theme-green [class*="bg-slate-50"],
+.theme-green [class*="bg-gray-"],
+.theme-green .card,
+.theme-green table,
+.theme-green div[class*="rounded"] {
+  background-color: #064e3b !important; /* emerald-900 */
+  color: #ecfdf5 !important;
+  border-color: #047857 !important;
+}

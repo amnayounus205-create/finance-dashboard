@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { User, Globe, Bell, Palette, Calendar, Clock, Save } from "lucide-react";
 import { useFinance } from "../context/FinanceContext";
 
 const Settings = () => {
-  const { userProfile, updateProfile, currentTheme, setCurrentTheme } = useFinance?.() || {};
+  const { userProfile, updateProfile, currentTheme, setCurrentTheme, setCurrency: handleGlobalCurrency } = useFinance?.() || {};
 
   const [name, setName] = useState(userProfile?.name || "John Doe");
   const [email, setEmail] = useState(userProfile?.email || "john.doe@example.com");
@@ -14,8 +14,27 @@ const Settings = () => {
   const [notifications, setNotifications] = useState(userProfile?.notifications ?? true);
   const [savedMessage, setSavedMessage] = useState(false);
 
+  // Sync state if userProfile updates asynchronously from context
+  useEffect(() => {
+    if (userProfile) {
+      setName(userProfile.name || "John Doe");
+      setEmail(userProfile.email || "john.doe@example.com");
+      if (userProfile.currency) setCurrency(userProfile.currency);
+      if (userProfile.dateFormat) setDateFormat(userProfile.dateFormat);
+      if (userProfile.timeZone) setTimeZone(userProfile.timeZone);
+      if (userProfile.language) setLanguage(userProfile.language);
+      if (userProfile.notifications !== undefined) setNotifications(userProfile.notifications);
+    }
+  }, [userProfile]);
+
   const handleSave = (e) => {
     e.preventDefault();
+    
+    // Update global currency context if changed
+    if (handleGlobalCurrency && currency) {
+      handleGlobalCurrency(currency);
+    }
+
     if (updateProfile) {
       updateProfile({
         name,
@@ -85,7 +104,7 @@ const Settings = () => {
           </div>
         </div>
 
-        {/* Theme / Appearance Section (Ab yahan se bhi theme select ho gi) */}
+        {/* Theme / Appearance Section */}
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-6 space-y-6">
           <div className="flex items-center gap-3 border-b border-gray-100 dark:border-slate-700 pb-4">
             <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-400 flex items-center justify-center">
@@ -100,7 +119,7 @@ const Settings = () => {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <button
               type="button"
-              onClick={() => setCurrentTheme("light")}
+              onClick={() => setCurrentTheme && setCurrentTheme("light")}
               className={`py-3 px-4 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
                 currentTheme === "light"
                   ? "border-blue-600 bg-blue-50 text-blue-700 shadow-sm"
@@ -111,7 +130,7 @@ const Settings = () => {
             </button>
             <button
               type="button"
-              onClick={() => setCurrentTheme("dark")}
+              onClick={() => setCurrentTheme && setCurrentTheme("dark")}
               className={`py-3 px-4 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
                 currentTheme === "dark"
                   ? "border-slate-500 bg-slate-700 text-white shadow-sm"
@@ -122,7 +141,7 @@ const Settings = () => {
             </button>
             <button
               type="button"
-              onClick={() => setCurrentTheme("blue")}
+              onClick={() => setCurrentTheme && setCurrentTheme("blue")}
               className={`py-3 px-4 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
                 currentTheme === "blue"
                   ? "border-blue-500 bg-blue-700 text-white shadow-sm"
@@ -133,7 +152,7 @@ const Settings = () => {
             </button>
             <button
               type="button"
-              onClick={() => setCurrentTheme("green")}
+              onClick={() => setCurrentTheme && setCurrentTheme("green")}
               className={`py-3 px-4 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
                 currentTheme === "green"
                   ? "border-emerald-500 bg-emerald-700 text-white shadow-sm"
@@ -215,7 +234,7 @@ const Settings = () => {
                 <option value="EST" className="dark:bg-slate-800">EST (Eastern Standard Time)</option>
                 <option value="PST" className="dark:bg-slate-800">PST (Pacific Standard Time)</option>
                 <option value="GMT" className="dark:bg-slate-800">GMT (Greenwich Mean Time)</option>
-                <option value="PKT" className="dark:bg-slate-800">PKT (Pakistan Standard Time)</option>
+                <option value="PKR" className="dark:bg-slate-800">PKR (Pakistan Standard Time)</option>
               </select>
             </div>
           </div>

@@ -1,13 +1,16 @@
 import { useState, useMemo } from "react";
-import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, ArrowUpRight, ArrowDownRight, CheckCircle2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Calendar as CalendarIcon, ArrowUpRight, ArrowDownRight, CheckCircle2, Trash2 } from "lucide-react";
 import { useFinance } from "../context/FinanceContext";
 
 const CalendarModule = () => {
-  const { incomes = [], expenses = [], addIncome, addExpense, categories = [], userProfile } = useFinance();
+  const { incomes = [], expenses = [], addIncome, addExpense, deleteTransaction, categories = [], userProfile } = useFinance();
   
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDateStr, setSelectedDateStr] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Delete confirmation state
+  const [deleteTarget, setDeleteTarget] = useState(null); // { id, type }
 
   // Form states for adding transaction from calendar
   const [txType, setTxType] = useState("expense");
@@ -116,6 +119,13 @@ const CalendarModule = () => {
     }
 
     setIsModalOpen(false);
+  };
+
+  const confirmDelete = () => {
+    if (deleteTarget) {
+      deleteTransaction(deleteTarget.id, deleteTarget.type);
+      setDeleteTarget(null);
+    }
   };
 
   // Get transactions for selected date detail view
@@ -235,14 +245,38 @@ const CalendarModule = () => {
                 <>
                   {selectedDayData.incomes.map(inc => (
                     <div key={inc.id} className="flex justify-between items-center p-3 rounded-xl bg-emerald-50/50 border border-emerald-100 text-xs">
-                      <span className="font-semibold text-secondary">{inc.category} ({inc.description || 'Income'})</span>
-                      <span className="font-bold text-emerald-600">+{currencySymbol}{inc.amount}</span>
+                      <div>
+                        <span className="font-semibold text-secondary block">{inc.category}</span>
+                        <span className="text-[10px] text-gray-400">{inc.description || 'Income'}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="font-bold text-emerald-600">+{currencySymbol}{inc.amount}</span>
+                        <button
+                          onClick={() => setDeleteTarget({ id: inc.id, type: "Income" })}
+                          className="p-1.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                          title="Delete Income"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
                     </div>
                   ))}
                   {selectedDayData.expenses.map(exp => (
                     <div key={exp.id} className="flex justify-between items-center p-3 rounded-xl bg-rose-50/50 border border-rose-100 text-xs">
-                      <span className="font-semibold text-secondary">{exp.category} ({exp.description || 'Expense'})</span>
-                      <span className="font-bold text-rose-600">-{currencySymbol}{exp.amount}</span>
+                      <div>
+                        <span className="font-semibold text-secondary block">{exp.category}</span>
+                        <span className="text-[10px] text-gray-400">{exp.description || 'Expense'}</span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="font-bold text-rose-600">-{currencySymbol}{exp.amount}</span>
+                        <button
+                          onClick={() => setDeleteTarget({ id: exp.id, type: "Expense" })}
+                          className="p-1.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition"
+                          title="Delete Expense"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </>
@@ -325,6 +359,37 @@ const CalendarModule = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-xl space-y-4 text-center animate-in fade-in zoom-in duration-200">
+            <div className="w-12 h-12 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-2">
+              <Trash2 size={24} />
+            </div>
+            <h3 className="text-lg font-bold text-secondary">Delete Transaction?</h3>
+            <p className="text-xs text-gray-500">
+              Are you sure you want to delete this {deleteTarget.type.toLowerCase()}? This action cannot be undone.
+            </p>
+            <div className="flex gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setDeleteTarget(null)}
+                className="flex-1 py-2 text-xs font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmDelete}
+                className="flex-1 py-2 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition shadow-sm"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}
